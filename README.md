@@ -1,5 +1,5 @@
-# PlatinumSrc<img src="https://raw.githubusercontent.com/PQCraft/PlatinumSrc/master/internal/engine/resources/icons/logo.png" align="right" height="120"/>
-**A WIP retro 3D game engine inspired by GoldSrc and Quake**<br>
+# TitaniumSrc<img src="https://raw.githubusercontent.com/PQCraft/PlatinumSrc/master/internal/engine/resources/icons/logo.png" align="right" height="120"/>
+**A Community Managed Fork of [PlatinumSrc](https://github.com/PlatinumSrc/PlatinumSrc) inspired by GoldSrc and Quake**<br>
 Progress can be found [here](TODO.md)
 
 ---
