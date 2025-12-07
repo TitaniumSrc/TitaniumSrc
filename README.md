@@ -1,5 +1,5 @@
 # TitaniumSrc<img src="https://raw.githubusercontent.com/PQCraft/PlatinumSrc/master/internal/engine/resources/icons/logo.png" align="right" height="120"/>
-**A Community Managed Fork of [PlatinumSrc](https://github.com/PlatinumSrc/PlatinumSrc) inspired by GoldSrc and Quake**<br>
+**A Community Developed Fork of [PlatinumSrc](https://github.com/PlatinumSrc/PlatinumSrc) inspired by GoldSrc and Quake**<br>
 Progress can be found [here](TODO.md)
 
 ---
@@ -29,41 +29,6 @@ https://github.com/user-attachments/assets/34b922c1-5fe6-409b-96fd-51a7227429c0
 - FreeBSD
 - NetBSD
 - OpenBSD
-- Windows 95
-</details>
-<details><summary><b>In progress</b></summary>
-
-- Xbox \(NXDK\)
-    - Needs an XGU renderer
-- Dreamcast
-    - Needs a PowerVR renderer
-- 3DS
-    - Needs a Citro3D renderer
-- GameCube
-    - Needs a GX renderer
-- Wii
-    - Needs a GX renderer
-- PS2
-    - Needs a GSKit renderer
-- Android
-    - Need to finish the touch UI
-    - Needs a GLES 3.0 renderer
-</details>
-<details><summary><b>Wanted</b></summary>
-
-- UWP/GameSDK
-    - Needs a D3D 9 renderer
-- PSP
-- PS Vita
-- Switch
-</details>
-<details><summary><b>Maybe</b></summary>
-
-- Xbox \(XDK\)
-    - Needs a D3D 7/8 renderer
-- N64
-- MSDOS
-- TI-Nspire CX
 </details>
 
 ---
