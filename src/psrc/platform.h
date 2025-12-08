@@ -7,18 +7,12 @@
 #define PLAT_WIN32     3
 #define PLAT_MACOS     4
 #define PLAT_EMSCR     5
-#define PLAT_NXDK      6
-#define PLAT_DREAMCAST 7
-#define PLAT_FREEBSD   8
-#define PLAT_NETBSD    9
-#define PLAT_OPENBSD   10
-#define PLAT_3DS       11
-#define PLAT_GAMECUBE  12
-#define PLAT_WII       13
-#define PLAT_PS2       14
-#define PLAT_GDK       15
-#define PLAT_ANDROID   16
-#define PLAT__COUNT    17
+#define PLAT_FREEBSD   6
+#define PLAT_NETBSD    7
+#define PLAT_OPENBSD   8
+#define PLAT_GDK       9
+#define PLAT_ANDROID   10
+#define PLAT__COUNT    11
 
 #define ARCH_UNKNOWN 0
 #define ARCH_AMD64   1
@@ -56,29 +50,11 @@
 #elif defined(macintosh) || defined(Macintosh) || (defined(__APPLE__) && defined(__MACH__))
     #define PLATFORM PLAT_MACOS
     #define PLATFLAGS (PLATFLAG_UNIXLIKE)
-#elif defined(NXDK)
-    #define PLATFORM PLAT_NXDK
-    #define PLATFLAGS (PLATFLAG_WINDOWSLIKE)
 #elif defined(PSRC_USEGDK) || defined(_GAMING_DESKTOP) || defined(__GDK__)
     #define PLATFORM PLAT_GDK
     #define PLATFLAGS (PLATFLAG_WINDOWSLIKE)
 #elif defined(__EMSCRIPTEN__)
     #define PLATFORM PLAT_EMSCR
-    #define PLATFLAGS (0)
-#elif defined(__DREAMCAST__) || defined(_arch_dreamcast)
-    #define PLATFORM PLAT_DREAMCAST
-    #define PLATFLAGS (0)
-#elif defined(__3DS__)
-    #define PLATFORM PLAT_3DS
-    #define PLATFLAGS (0)
-#elif defined(__gamecube__)
-    #define PLATFORM PLAT_GAMECUBE
-    #define PLATFLAGS (0)
-#elif defined(_EE)
-    #define PLATFORM PLAT_PS2
-    #define PLATFLAGS (0)
-#elif defined(__wii__)
-    #define PLATFORM PLAT_WII
     #define PLATFLAGS (0)
 #elif defined(_WIN32)
     #define PLATFORM PLAT_WIN32

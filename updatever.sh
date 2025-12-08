@@ -5,9 +5,9 @@
 VERSION_H="src/psrc/version.h"
 DATE="$(date -u +'%Y%m%d')"
 
-VERLINE="$(grep -E '\s*#define\s+PSRC_BUILD\s+' "${VERSION_H}")"
-VERDEF="$(printf '%s' "${VERLINE}" | grep -Eo '\s*#define\s+PSRC_BUILD\s+')"
-CURVER="$(printf '%s' "${VERLINE}" | sed -E 's/\s*#define\s+PSRC_BUILD\s+//')"
+VERLINE="$(grep -E '\s*#define\s+TISRC_BUILD\s+' "${VERSION_H}")"
+VERDEF="$(printf '%s' "${VERLINE}" | grep -Eo '\s*#define\s+TISRC_BUILD\s+')"
+CURVER="$(printf '%s' "${VERLINE}" | sed -E 's/\s*#define\s+TISRC_BUILD\s+//')"
 
 VERDATE="${CURVER::${#CURVER}-2}"
 VERREV="${CURVER:${#CURVER}-2}"
@@ -22,7 +22,7 @@ else
     NEWVER="${DATE}$(printf '%02u' "$((10#${VERREV}+1))")"
 fi
 
-sed -Ei 's/\s*#define\s+PSRC_BUILD\s+.*/'"${VERDEF}${NEWVER}"'/' "${VERSION_H}"
+sed -Ei 's/\s*#define\s+TISRC_BUILD\s+.*/'"${VERDEF}${NEWVER}"'/' "${VERSION_H}"
 
 echo "Updated to ${NEWVER}"
 

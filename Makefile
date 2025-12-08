@@ -91,167 +91,6 @@ else ifeq ($(CROSS),emscr)
     NOSTRIP := y
     MT := 0
     USEGL11 := y
-else ifeq ($(CROSS),nxdk)
-    ifndef NXDK_DIR
-        $(error Please define the NXDK_DIR environment variable)
-    endif
-    ifneq ($(MODULE),engine)
-        $(error Invalid module: $(MODULE))
-    endif
-    PLATFORM := NXDK
-    CC := nxdk-cc
-    LD := nxdk-link
-    STRIP := strip
-    OBJCOPY := objcopy
-    _CC := $(CC)
-    _LD := $(LD)
-    _STRIP := $(TOOLCHAIN)$(STRIP)
-    _OBJCOPY := $(TOOLCHAIN)$(OBJCOPY)
-    EMULATOR := xemu
-    EMUPATHFLAG := -dvd_path
-    CXBE := $(NXDK_DIR)/tools/cxbe/cxbe
-    EXTRACT_XISO := $(NXDK_DIR)/tools/extract-xiso/build/extract-xiso
-    XBE_TITLE := PlatinumSrc
-    XBE_TITLEID := PQ-001
-    XBE_VERSION := $(shell grep '#define PSRC_BUILD ' $(SRCDIR)/psrc/version.h | sed 's/#define .* //')
-    XBE_XTIMAGE := icons/engine.xpr
-    XISO := $(OUTDIR)/$(XBE_TITLE).xiso.iso
-    XISODIR := $(OUTDIR)/xiso
-    NOLTO := y
-    MT := 1
-    NOSIMD := y
-    USESTDTHREAD := y
-    USEXGU := y
-    MKENV.NXDK := $(MKENV.NXDK) NXDK_ONLY=y NXDK_SDL=y LIB="nxdk-lib -llvmlibempty"
-    MKENV.NXDK := $(MKENV.NXDK) LIBSDLIMAGE_SRCS="" LIBSDLIMAGE_OBJS=""
-    MKENV.NXDK := $(MKENV.NXDK) FREETYPE_SRCS="" FREETYPE_OBJS=""
-    MKENV.NXDK := $(MKENV.NXDK) SDL_TTF_SRCS="" SDL_TTF_OBJS=""
-    MKENV.NXDK := $(MKENV.NXDK) SDL2TEST_SRCS="" SDL2TEST_OBJS=""
-    MKENV.NXDK := $(MKENV.NXDK) LIBCXX_SRCS="" LIBCXX_OBJS=""
-    MKENV.NXDK := $(MKENV.NXDK) LIBPNG_SRCS="" LIBPNG_OBJS=""
-    MKENV.NXDK := $(MKENV.NXDK) LIBJPEG_TURBO_OBJS="" LIBJPEG_TURBO_SRCS=""
-    MKENV.NXDK := $(MKENV.NXDK) ZLIB_OBJS="" ZLIB_SRCS=""
-else ifeq ($(CROSS),ps2)
-    ifndef PS2DEV
-        $(error Please define the PS2DEV environment variable)
-    endif
-    ifndef PS2SDK
-        $(error Please define the PS2SDK environment variable)
-    endif
-    ifndef GSKIT
-        $(error Please define the GSKIT environment variable)
-    endif
-    TOOLCHAIN := mips64r5900el-ps2-elf-
-    CC := gcc
-    LD := $(CC)
-    STRIP := strip
-    _CC := $(TOOLCHAIN)$(CC)
-    _LD := $(TOOLCHAIN)$(LD)
-    _STRIP := $(TOOLCHAIN)$(STRIP)
-    EMULATOR := pcsx2
-    EMUPATHFLAG := --
-    MT := 1
-    USEGSKIT := y
-else ifeq ($(CROSS),dc)
-    ifndef KOS_BASE
-        $(error Please source KallistiOS' environment.sh for the KOS_BASE environment variable)
-    endif
-    PLATFORM := Dreamcast
-    CC := $(KOS_CC)
-    LD := $(CC)
-    STRIP := $(KOS_STRIP)
-    OBJCOPY := $(KOS_OBJCOPY)
-    _CC := $(CC)
-    _LD := $(LD)
-    _STRIP := $(STRIP)
-    _OBJCOPY := $(OBJCOPY)
-    EMULATOR := flycast
-    SCRAMBLE := $(KOS_BASE)/utils/scramble/scramble
-    MAKEIP := $(KOS_BASE)/utils/makeip/makeip
-    MKISOFS := mkisofs
-    CDI4DC := $(KOS_BASE)/utils/img4dc/cdi4dc/cdi4dc
-    IP_TITLE := PlatinumSrc
-    IP_COMPANY := PQCraft
-    IP_MRIMAGE := icons/engine.mr
-    CDI := $(OUTDIR)/$(IP_TITLE).cdi
-    CDIDIR := $(OUTDIR)/cdi
-    MT := 1
-    USESTDTHREAD := y
-    USEPVR := y
-    USESDL1 := y
-else ifeq ($(CROSS),3ds)
-    ifndef DEVKITPRO
-        $(error Please source DevkitPro's devkit-env.sh for the DEVKITPRO environment variable)
-    endif
-    ifndef DEVKITARM
-        $(error Please source DevkitPro's devkit-env.sh for the DEVKITARM environment variable)
-    endif
-    PLATFORM := 3DS
-    TOOLCHAIN := $(DEVKITARM)/bin/arm-none-eabi-
-    CC := gcc
-    LD := $(CC)
-    STRIP := strip
-    _CC := $(TOOLCHAIN)$(CC)
-    _LD := $(TOOLCHAIN)$(LD)
-    _STRIP := $(TOOLCHAIN)$(STRIP)
-    EMULATOR := lime3ds
-    SMDHTOOL := smdhtool
-    3DSXTOOL := 3dsxtool
-    MAKEROM := makerom
-    SMDH_TITLE := PlatinumSrc
-    SMDH_DESC := PlatinumSrc engine
-    SMDH_AUTHOR := PQCraft
-    SMDH_ICON := icons/engine.png
-    RSF_TITLE := PlatinumSrc
-    RSF_PRODUCTCODE := CTR-N-PSRC
-    RSF_UNIQUEID := 0x0FC3
-    RSF_SYSTEMMODE := 64MB
-    RSF_SYSTEMMODEEXT := Legacy
-    RSF_CPUSPEED := 804MHz
-    SMDH := $(OUTDIR)/$(SMDH_TITLE).smdh
-    3DSX := $(OUTDIR)/$(SMDH_TITLE).3dsx
-    MT := 1
-    USEC3D := y
-else ifeq ($(CROSS),wii)
-    ifndef DEVKITPRO
-        $(error Please source DevkitPro's devkit-env.sh for the DEVKITPRO environment variable)
-    endif
-    ifndef DEVKITPPC
-        $(error Please source DevkitPro's devkit-env.sh for the DEVKITPPC environment variable)
-    endif
-    PLATFORM := Wii
-    TOOLCHAIN := $(DEVKITPPC)/bin/powerpc-eabi-
-    CC := gcc
-    LD := $(CC)
-    STRIP := strip
-    _CC := $(TOOLCHAIN)$(CC)
-    _LD := $(TOOLCHAIN)$(LD)
-    _STRIP := $(TOOLCHAIN)$(STRIP)
-    EMULATOR := dolphin-emu
-    EMUPATHFLAG := --
-    ELF2DOL := elf2dol
-    MT := 1
-    USEGX := y
-else ifeq ($(CROSS),gc)
-    ifndef DEVKITPRO
-        $(error Please source DevkitPro's devkit-env.sh for the DEVKITPRO environment variable)
-    endif
-    ifndef DEVKITPPC
-        $(error Please source DevkitPro's devkit-env.sh for the DEVKITPPC environment variable)
-    endif
-    PLATFORM := GameCube
-    TOOLCHAIN := $(DEVKITPPC)/bin/powerpc-eabi-
-    CC := gcc
-    LD := $(CC)
-    STRIP := strip
-    _CC := $(TOOLCHAIN)$(CC)
-    _LD := $(TOOLCHAIN)$(LD)
-    _STRIP := $(TOOLCHAIN)$(STRIP)
-    EMULATOR := dolphin-emu
-    EMUPATHFLAG := --
-    ELF2DOL := elf2dol
-    MT := 1
-    USEGX := y
 else
     $(error Invalid cross-compilation target: $(CROSS))
 endif
@@ -292,7 +131,7 @@ _OBJDIR := $(OBJDIR)/$(PLATFORMDIR)
 
 ifeq ($(CROSS),win32)
     SOSUF := .dll
-else ifneq ($(CROSS),nxdk)
+else
     SOSUF := .so
 endif
 
@@ -311,101 +150,94 @@ ifeq ($(MTLVL),)
     MTLVL := 2
 endif
 
-_CFLAGS := $(CFLAGS) -I$(EXTDIR)/$(PLATFORM)/include -I$(EXTDIR)/include -fno-exceptions -Wall -Wextra -Wuninitialized
-_CPPFLAGS := $(CPPFLAGS) -DPSRC_MTLVL=$(MTLVL)
+_CFLAGS := $(CFLAGS) -I$(EXTDIR)/$(PLATFORM)/include -I$(EXTDIR)/include -fno-exceptions -Wall -Wextra -Wuninitialized -Wundef -fvisibility=hidden
+_CPPFLAGS := $(CPPFLAGS) -DPSRC_MTLVL=$(MTLVL) -D_DEFAULT_SOURCE -D_GNU_SOURCE
 _LDFLAGS := $(LDFLAGS) -L$(EXTDIR)/$(PLATFORM)/lib -L$(EXTDIR)/lib
-_LDLIBS := $(LDLIBS)
+_LDLIBS := $(LDLIBS) -lm
 _WRFLAGS := $(WRFLAGS)
-ifneq ($(CROSS),nxdk)
-    _CFLAGS += -Wundef -fvisibility=hidden
-    ifneq ($(NOFASTMATH),y)
-        _CFLAGS += -ffast-math
-        _LDFLAGS += -ffast-math
+ifneq ($(NOFASTMATH),y)
+    _CFLAGS += -ffast-math
+    _LDFLAGS += -ffast-math
+endif
+ifeq ($(CROSS),)
+    _CFLAGS += -I/usr/local/include
+    _LDFLAGS += -L/usr/local/lib
+    ifeq ($(KERNEL),Darwin)
+        _CFLAGS += -I/opt/homebrew/include
+        _LDFLAGS += -L/opt/homebrew/lib
     endif
-    _CPPFLAGS += -D_DEFAULT_SOURCE -D_GNU_SOURCE
-    ifeq ($(CROSS),)
-        _CFLAGS += -I/usr/local/include
-        _LDFLAGS += -L/usr/local/lib
-        ifeq ($(KERNEL),Darwin)
-            _CFLAGS += -I/opt/homebrew/include
-            _LDFLAGS += -L/opt/homebrew/lib
-        endif
-    else ifeq ($(CROSS),win32)
-        _LDFLAGS += -static -static-libgcc
-    else ifeq ($(CROSS),android)
-        _CFLAGS += -fPIC -fcf-protection=none
-        #_CFLAGS += -fno-stack-clash-protection
-        _LDFLAGS += -shared
-        _LDLIBS += -llog -landroid
-    else ifeq ($(CROSS),emscr)
-        _LDFLAGS += -sALLOW_MEMORY_GROWTH -sEXIT_RUNTIME -sEXPORTED_RUNTIME_METHODS=ccall -sWASM_BIGINT
-        ifndef EMSCR_SHELL
-            _LDFLAGS += --shell-file $(SRCDIR)/psrc/emscr_shell.html
-        else
-            _LDFLAGS += --shell-file $(EMSCR_SHELL)
-        endif
-        _LDLIBS += -lidbfs.js
-        ifeq ($(USEGL),y)
-            _LDFLAGS += -sLEGACY_GL_EMULATION -sGL_UNSAFE_OPTS=0
-        endif
-        _LDFLAGS += --embed-file internal/engine/ --embed-file internal/server/ --embed-file games/ --embed-file mods/
-    else ifeq ($(CROSS),3ds)
-        _CFLAGS += -march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft -mword-relocations -ffunction-sections -I$(DEVKITPRO)/libctru/include -I$(DEVKITPRO)/portlibs/3ds/include
-        _CPPFLAGS += -D__3DS__
-        _LDFLAGS += -specs=3dsx.specs -march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft -L$(DEVKITPRO)/libctru/lib -L$(DEVKITPRO)/portlibs/3ds/lib
-        _LDLIBS += -lcitro2d -lcitro3d
-    else ifeq ($(CROSS),wii)
-        _CFLAGS += -mrvl -mcpu=750 -meabi -mhard-float -I$(DEVKITPRO)/libogc/include -I$(DEVKITPRO)/portlibs/wii/include
-        _CPPFLAGS += -DGEKKO -D__wii__
-        _LDFLAGS += -mrvl -mcpu=750 -meabi -mhard-float -L$(DEVKITPRO)/libogc/lib/wii -L$(DEVKITPRO)/portlibs/wii/lib
-        _LDLIBS += -lfat
-    else ifeq ($(CROSS),gc)
-        _CFLAGS += -mogc -mcpu=750 -meabi -mhard-float -I$(DEVKITPRO)/libogc/include -I$(DEVKITPRO)/portlibs/gamecube/include
-        _CPPFLAGS += -DGEKKO -D__gamecube__
-        _LDFLAGS += -mogc -mcpu=750 -meabi -mhard-float -L$(DEVKITPRO)/libogc/lib/cube -L$(DEVKITPRO)/portlibs/gamecube/lib
+else ifeq ($(CROSS),win32)
+    _LDFLAGS += -static -static-libgcc
+else ifeq ($(CROSS),android)
+    _CFLAGS += -fPIC -fcf-protection=none
+    #_CFLAGS += -fno-stack-clash-protection
+    _LDFLAGS += -shared
+    _LDLIBS += -llog -landroid
+else ifeq ($(CROSS),emscr)
+    _LDFLAGS += -sALLOW_MEMORY_GROWTH -sEXIT_RUNTIME -sEXPORTED_RUNTIME_METHODS=ccall -sWASM_BIGINT
+    ifndef EMSCR_SHELL
+        _LDFLAGS += --shell-file $(SRCDIR)/psrc/emscr_shell.html
+    else
+        _LDFLAGS += --shell-file $(EMSCR_SHELL)
     endif
+    _LDLIBS += -lidbfs.js
     ifeq ($(USEGL),y)
-        ifeq ($(USEGLAD),y)
-            _CPPFLAGS += -DPSRC_ENGINE_RENDERER_GL_USEGLAD
+        _LDFLAGS += -sLEGACY_GL_EMULATION -sGL_UNSAFE_OPTS=0
+    endif
+    _LDFLAGS += --embed-file internal/engine/ --embed-file internal/server/ --embed-file games/ --embed-file mods/
+else ifeq ($(CROSS),3ds)
+    _CFLAGS += -march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft -mword-relocations -ffunction-sections -I$(DEVKITPRO)/libctru/include -I$(DEVKITPRO)/portlibs/3ds/include
+    _CPPFLAGS += -D__3DS__
+    _LDFLAGS += -specs=3dsx.specs -march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft -L$(DEVKITPRO)/libctru/lib -L$(DEVKITPRO)/portlibs/3ds/lib
+    _LDLIBS += -lcitro2d -lcitro3d
+else ifeq ($(CROSS),wii)
+    _CFLAGS += -mrvl -mcpu=750 -meabi -mhard-float -I$(DEVKITPRO)/libogc/include -I$(DEVKITPRO)/portlibs/wii/include
+    _CPPFLAGS += -DGEKKO -D__wii__
+    _LDFLAGS += -mrvl -mcpu=750 -meabi -mhard-float -L$(DEVKITPRO)/libogc/lib/wii -L$(DEVKITPRO)/portlibs/wii/lib
+    _LDLIBS += -lfat
+else ifeq ($(CROSS),gc)
+    _CFLAGS += -mogc -mcpu=750 -meabi -mhard-float -I$(DEVKITPRO)/libogc/include -I$(DEVKITPRO)/portlibs/gamecube/include
+    _CPPFLAGS += -DGEKKO -D__gamecube__
+    _LDFLAGS += -mogc -mcpu=750 -meabi -mhard-float -L$(DEVKITPRO)/libogc/lib/cube -L$(DEVKITPRO)/portlibs/gamecube/lib
+endif
+ifeq ($(USEGL),y)
+    ifeq ($(USEGLAD),y)
+        _CPPFLAGS += -DPSRC_ENGINE_RENDERER_GL_USEGLAD
+    else
+        _LDLIBS += -lGL
+    endif
+endif
+ifneq ($(MT),0)
+    ifneq ($(USESTDTHREAD),y)
+        ifneq ($(CROSS),win32)
+            ifneq ($(CROSS),dc)
+                _CFLAGS += -pthread
+            endif
+            _LDLIBS += -lpthread
         else
-            _LDLIBS += -lGL
-        endif
-    endif
-    ifneq ($(MT),0)
-        ifneq ($(USESTDTHREAD),y)
-            ifneq ($(CROSS),win32)
-                ifneq ($(CROSS),dc)
-                    _CFLAGS += -pthread
-                endif
-                _LDLIBS += -lpthread
-            else
-                ifeq ($(USEWINPTHREAD),y)
-                    _CFLAGS += -pthread
-                    _CPPFLAGS += -DPSRC_THREADING_USEWINPTHREAD
-                    _LDLIBS += -l:libwinpthread.a
-                endif
+            ifeq ($(USEWINPTHREAD),y)
+                _CFLAGS += -pthread
+                _CPPFLAGS += -DPSRC_THREADING_USEWINPTHREAD
+                _LDLIBS += -l:libwinpthread.a
             endif
         endif
     endif
-    ifneq ($(CROSS),emscr)
-        ifeq ($(M32),y)
-            _CFLAGS += -m32
-            _CPPFLAGS += -DM32
-            _LDFLAGS += -m32
-            ifeq ($(CROSS),win32)
-                _WRFLAGS += -DM32
-            endif
-        endif
-        ifdef DEBUG
-            #_LDFLAGS += -Wl,-R$(EXTDIR)/$(PLATFORM)/lib -Wl,-R$(EXTDIR)/lib
-        endif
-        ifeq ($(NATIVE),y)
-            _CFLAGS += -march=native -mtune=native
+endif
+ifneq ($(CROSS),emscr)
+    ifeq ($(M32),y)
+        _CFLAGS += -m32
+        _CPPFLAGS += -DM32
+        _LDFLAGS += -m32
+        ifeq ($(CROSS),win32)
+            _WRFLAGS += -DM32
         endif
     endif
-    _LDLIBS += -lm
-else
-    _CPPFLAGS += -DPB_HAL_FONT
+    ifdef DEBUG
+        #_LDFLAGS += -Wl,-R$(EXTDIR)/$(PLATFORM)/lib -Wl,-R$(EXTDIR)/lib
+    endif
+    ifeq ($(NATIVE),y)
+        _CFLAGS += -march=native -mtune=native
+    endif
 endif
 ifneq ($(DEFAULTGAME),)
     _CPPFLAGS += -DPSRC_DEFAULTGAME='$(subst ','\'',$(DEFAULTGAME))'
@@ -445,10 +277,8 @@ ifeq ($(USEGLES30),y)
 endif
 ifndef DEBUG
     _CPPFLAGS += -DNDEBUG=1
-    ifneq ($(CROSS),nxdk)
-        ifneq ($(NOGCSECTIONS),y)
-            _LDFLAGS += -Wl,--gc-sections
-        endif
+    ifneq ($(NOGCSECTIONS),y)
+        _LDFLAGS += -Wl,--gc-sections
     endif
     ifndef O
         O := 2
@@ -464,27 +294,17 @@ ifndef DEBUG
     endif
     ifneq ($(NOLTO),y)
         _CFLAGS += -flto
-        ifneq ($(CROSS),nxdk)
-            _LDFLAGS += -flto
-        else
-            MKENV.NXDK := $(MKENV.NXDK) LTO=y
-        endif
+        _LDFLAGS += -flto
     endif
 else
     _CPPFLAGS += -DPSRC_DBGLVL=$(DEBUG)
-    ifneq ($(CROSS),nxdk)
-        ifndef O
-            O := g
-        endif
-        _CFLAGS += -O$(O) -g -Wdouble-promotion -fno-omit-frame-pointer
-        #_CFLAGS += -Wconversion
-        ifneq ($(CROSS),emscr)
-            _CFLAGS += -std=c11 -pedantic
-        endif
-    else
-        _CFLAGS += -g -gdwarf-4
-        _LDFLAGS += -debug
-        MKENV.NXDK := $(MKENV.NXDK) DEBUG=y
+    ifndef O
+        O := g
+    endif
+    _CFLAGS += -O$(O) -g -Wdouble-promotion -fno-omit-frame-pointer
+    #_CFLAGS += -Wconversion
+    ifneq ($(CROSS),emscr)
+        _CFLAGS += -std=c11 -pedantic
     endif
     ifeq ($(CROSS),win32)
         _WRFLAGS += -DPSRC_DBGLVL=$(DEBUG)
@@ -606,40 +426,12 @@ else ifeq ($(MODULE),editor)
     _LDLIBS += $(LDLIBS.lib.discord_game_sdk) $(LDLIBS.lib.SDL)
 endif
 
-ifeq ($(CROSS),nxdk)
-
-__CFLAGS := $(_CFLAGS) $(_CPPFLAGS)
-__CFLAGS := $(filter-out -Wall,$(__CFLAGS))
-__CFLAGS := $(filter-out -Wextra,$(__CFLAGS))
-__CFLAGS := $(filter-out -Wuninitialized,$(__CFLAGS))
-__LDFLAGS := $(_LDFLAGS)
-
-include $(NXDK_DIR)/lib/Makefile
-include $(NXDK_DIR)/lib/net/Makefile
-include $(NXDK_DIR)/lib/sdl/SDL2/Makefile.xbox
-include $(NXDK_DIR)/lib/sdl/Makefile
-
-_CFLAGS += $(NXDK_CFLAGS)
-_LDFLAGS += $(NXDK_LDFLAGS)
-
-else ifeq ($(CROSS),dc)
-    _CFLAGS += $(KOS_CFLAGS) $(KOS_INC_PATHS)
-    _LDFLAGS += $(KOS_LDFLAGS) $(KOS_LIB_PATHS)
-    _LDLIBS += $(KOS_START) $(KOS_LIBS)
-else ifeq ($(CROSS),3ds)
-    _LDLIBS += -lctru
-else ifeq ($(CROSS),wii)
-    _LDLIBS += -logc
-else ifeq ($(CROSS),gc)
-    _LDLIBS += -logc
-endif
-
 ifeq ($(MODULE),server)
-BIN := psrc-server
+BIN := tisrc-server
 else ifeq ($(MODULE),editor)
-BIN := psrc-editor
+BIN := tisrc-editor
 else
-BIN := psrc
+BIN := tisrc
 endif
 ifdef DEBUG
     ifneq ($(CROSS),android)
@@ -655,16 +447,6 @@ else ifeq ($(CROSS),android)
     BINPATH := lib$(BIN).so
 else ifeq ($(CROSS),emscr)
     BINPATH := index.html
-else ifeq ($(CROSS),nxdk)
-    BINPATH := $(BIN).exe
-else ifeq ($(CROSS),dc)
-    BINPATH := $(BIN).elf
-else ifeq ($(CROSS),3ds)
-    BINPATH := $(BIN).elf
-else ifeq ($(CROSS),wii)
-    BINPATH := $(BIN).elf
-else ifeq ($(CROSS),gc)
-    BINPATH := $(BIN).elf
 else
     BINPATH := $(BIN)
 endif
@@ -678,23 +460,7 @@ ifeq ($(CROSS),win32)
     endif
 endif
 
-ifneq ($(ONLYBIN),y)
-	ifeq ($(CROSS),nxdk)
-		TARGET = $(XISO)
-	else ifeq ($(CROSS),dc)
-		TARGET = $(CDI)
-	else ifeq ($(CROSS),3ds)
-		TARGET = $(3DSX)
-	else ifeq ($(CROSS),wii)
-		TARGET = $(OUTDIR)/boot.dol
-	else ifeq ($(CROSS),gc)
-		TARGET = $(OUTDIR)/boot.dol
-	else
-		TARGET = $(BINPATH)
-	endif
-else
-	TARGET = $(BINPATH)
-endif
+TARGET := $(BINPATH)
 
 define mkdir
 for d in $(1); do if [ ! -d $$d ]; then echo Creating $$d/...; mkdir -p -- $$d; fi; done
@@ -781,11 +547,6 @@ ifeq ($(TR),y)
 	@printf 'Total time spent compiling: %ss\n' $$(sed 's/.\{2\}$$/.&/' <<< $$((($$(date +%s%N)-$$(cat $(_TR_STFILE)))/10000000))) >> $(TR_FILE)
 	@rm $(_TR_STFILE)
 endif
-ifeq ($(CROSS),nxdk)
-	@echo Making NXDK libs...
-	@export CFLAGS='$(__CFLAGS)'; export LDFLAGS='$(__LDFLAGS)'; '$(MAKE)' --no-print-directory -C '$(NXDK_DIR)' ${MKENV.NXDK} main.exe
-	@echo Made NXDK libs
-endif
 	@echo Linking $@...
 ifeq ($(CROSS),win32)
 ifneq ($(_WINDRES),)
@@ -795,12 +556,6 @@ endif
 ifeq ($(CROSS),emscr)
 	@$(_LD) $(_LDFLAGS) $^ $(_LDLIBS) -o $(OUTDIR)/$(BIN).html
 	@mv -f $(OUTDIR)/$(BIN).html $(BINPATH)
-else ifeq ($(CROSS),nxdk)
-	@$(_LD) $(_LDFLAGS) $^ '$(NXDK_DIR)'/lib/*.lib '$(NXDK_DIR)'/lib/xboxkrnl/libxboxkrnl.lib $(_LDLIBS) -out:$@ > $(null)
-ifneq ($(XBE_XTIMAGE),)
-	-@$(_OBJCOPY) --long-section-names=enable --update-section 'XTIMAGE=$(XBE_XTIMAGE)' $@
-endif
-	-@$(_OBJCOPY) --long-section-names=enable --rename-section 'XTIMAGE=$$$$XTIMAGE' --rename-section 'XSIMAGE=$$$$XSIMAGE' $@
 else
 	@$(_LD) $(_LDFLAGS) $^ $(_WROBJ) $(_LDLIBS) -o $@
 ifneq ($(NOSTRIP),y)
@@ -827,75 +582,10 @@ endif
 	@$(call rmdir,$(_OBJDIR))
 
 distclean: clean
-ifeq ($(CROSS),nxdk)
-	@$(call rm,$(XISODIR)/default.xbe)
-	@$(call rm,$(BINPATH))
-	@$(call rm,$(BINPATH:.exe=.pdb))
-else ifeq ($(CROSS),emscr)
+ifeq ($(CROSS),emscr)
 	@$(call rm,$(basename $(OUTDIR)/$(BIN)).js)
 	@$(call rm,$(basename $(OUTDIR)/$(BIN)).wasm)
 endif
 	@$(call rm,$(TARGET))
 
 .PHONY: default build run clean distclean $(_OBJDIR)
-
-ifeq ($(CROSS),nxdk)
-
-$(XISODIR):
-	@$(call mkdir,$@)
-
-$(XISODIR)/default.xbe: $(BINPATH) | $(XISODIR)
-	@echo Relinking $@ from $<...
-	@'$(CXBE)' -OUT:$@ -TITLE:"$(XBE_TITLE)" -TITLEID:$(XBE_TITLEID) -VERSION:$(XBE_VERSION) $< > $(null)
-
-$(XISO): $(XISODIR)/default.xbe | $(XISODIR)
-	@echo Creating $@...
-	@'$(EXTRACT_XISO)' -c $(XISODIR) "$@" > $(null)
-
-else ifeq ($(CROSS),dc)
-
-$(CDIDIR):
-	@$(call mkdir,$@)
-
-$(CDIDIR)/1ST_READ.bin: $(BINPATH) | $(CDIDIR)
-	@echo Creating $@ from $<...
-	@$(_OBJCOPY) -R .stack -O binary $< $<.bin
-	@'$(SCRAMBLE)' $<.bin $@
-	@$(call rm,$<.bin)
-
-$(OUTDIR)/IP.BIN:
-ifneq ($(IP_MRIMAGE),)
-	@'$(MAKEIP)' -g "$(IP_TITLE)" -c "$(IP_COMPANY)" -l $(IP_MRIMAGE) $@
-else
-	@'$(MAKEIP)' -g "$(IP_TITLE)" -c "$(IP_COMPANY)" $@
-endif
-
-$(CDI): $(CDIDIR)/1ST_READ.bin $(OUTDIR)/IP.BIN
-	@echo Creating $@...
-	@$(MKISOFS) -f -C 0,11702 -V '$(IP_TITLE)' -G $(OUTDIR)/IP.BIN -rJl -o $(patsubst %.cdi,%.iso,$@) $(CDIDIR)
-	@$(CDI4DC) $(patsubst %.cdi,%.iso,$@) $@
-	@$(call rm,$(patsubst %.cdi,%.iso,$@))
-
-else ifeq ($(CROSS),3ds)
-
-$(SMDH):
-	@echo Creating $@
-	@$(SMDHTOOL) --create "$(SMDH_TITLE)" "$(SMDH_DESC)" "$(SMDH_AUTHOR)" $(SMDH_ICON) $@
-
-$(3DSX): $(BINPATH) $(SMDH)
-	@echo Creating $@ from $<...
-	@$(3DSXTOOL) $< $@ --smdh=$(SMDH)
-
-else ifeq ($(CROSS),wii)
-
-$(OUTDIR)/boot.dol: $(BINPATH)
-	@echo Creating $@ from $<...
-	@$(ELF2DOL) -- $< $@
-
-else ifeq ($(CROSS),gc)
-
-$(OUTDIR)/boot.dol: $(BINPATH)
-	@echo Creating $@ from $<...
-	@$(ELF2DOL) -- $< $@
-
-endif

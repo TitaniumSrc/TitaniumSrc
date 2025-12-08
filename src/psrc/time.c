@@ -8,24 +8,16 @@
     #include <mach/mach_time.h>
     #include <CoreServices/CoreServices.h>
 #endif
-#if PLATFORM == PLAT_NXDK
-    #include <xboxkrnl/xboxkrnl.h>
-#endif
 
 #include "attribs.h"
 
-#if PLATFORM == PLAT_NXDK
-    uint64_t perfctfreq;
-#elif (PLATFLAGS & PLATFLAG_WINDOWSLIKE)
+#if (PLATFLAGS & PLATFLAG_WINDOWSLIKE)
     LARGE_INTEGER perfctfreq;
     uint64_t perfctmul = 1000000;
 #endif
 
 uint64_t altutime(void) {
-    #if PLATFORM == PLAT_NXDK
-        uint64_t time = KeQueryPerformanceCounter();
-        return time * 1000000 / perfctfreq;
-    #elif (PLATFLAGS & PLATFLAG_WINDOWSLIKE)
+    #if (PLATFLAGS & PLATFLAG_WINDOWSLIKE)
         LARGE_INTEGER time;
         QueryPerformanceCounter(&time);
         return time.QuadPart * perfctmul / perfctfreq.QuadPart;
@@ -41,10 +33,7 @@ uint64_t altutime(void) {
 }
 
 void microwait(uint64_t d) {
-    #if PLATFORM == PLAT_NXDK
-        LARGE_INTEGER tmpd = {.QuadPart = d * -10};
-        KeDelayExecutionThread(UserMode, true, &tmpd);
-    #elif (PLATFLAGS & PLATFLAG_WINDOWSLIKE)
+    #if (PLATFLAGS & PLATFLAG_WINDOWSLIKE)
         #if PSRC_MTLVL >= 2
         static THREADLOCAL HANDLE timer = NULL;
         #else

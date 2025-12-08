@@ -15,12 +15,7 @@
 #include <stdbool.h>
 
 #if defined(PSRC_MODULE_ENGINE) || defined(PSRC_MODULE_EDITOR)
-    #if PLATFORM != PLAT_NXDK
-        #include "incsdl.h"
-    #else
-        #include <pbkit/pbkit.h>
-        #include <pbkit/nv_regs.h>
-    #endif
+    #include "incsdl.h"
 #endif
 #if PLATFORM == PLAT_WIN32
     #include <windows.h>
@@ -36,25 +31,11 @@
 mutex_t loglock;
 #endif
 
-#if PLATFORM == PLAT_NXDK || PLATFORM == PLAT_DREAMCAST || PLATFORM == PLAT_3DS || \
-PLATFORM == PLAT_GAMECUBE || PLATFORM == PLAT_WII || PLATFORM == PLAT_PS2
-    #ifndef PSRC_LOG_RINGSIZE
-        #if !DEBUG(1)
-            #define PSRC_LOG_RINGSIZE 128
-        #else
-            #define PSRC_LOG_RINGSIZE 256
-        #endif
-    #endif
-    #ifndef PSRC_LOG_LINESIZE
-        #define PSRC_LOG_LINESIZE 256
-    #endif
-#else
-    #ifndef PSRC_LOG_RINGSIZE
-        #define PSRC_LOG_RINGSIZE 256
-    #endif
-    #ifndef PSRC_LOG_LINESIZE
-        #define PSRC_LOG_LINESIZE 512
-    #endif
+#ifndef PSRC_LOG_RINGSIZE
+    #define PSRC_LOG_RINGSIZE 256
+#endif
+#ifndef PSRC_LOG_LINESIZE
+    #define PSRC_LOG_LINESIZE 512
 #endif
 
 static struct {
@@ -350,7 +331,7 @@ static void plog_internal(enum loglevel lvl, const char* func, const char* file,
         }
         __android_log_write(p, "PlatinumSrc", ring[ringnext].text);
     #endif
-    #if (defined(PSRC_MODULE_ENGINE) || defined(PSRC_MODULE_EDITOR)) && PLATFORM != PLAT_NXDK
+    #if defined(PSRC_MODULE_ENGINE) || defined(PSRC_MODULE_EDITOR)
         if (lvl & LF_MSGBOX) {
             #if PLATFORM != PLAT_WIN32
                 #ifndef PSRC_USESDL1

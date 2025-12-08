@@ -2120,15 +2120,11 @@ bool startAudio(void) {
         inspec.freq = atoi(tmp);
         free(tmp);
     } else {
-        #if PLATFORM == PLAT_3DS || PLATFORM == PLAT_DREAMCAST
-        inspec.freq = 11025;
-        #elif PLATFORM == PLAT_NXDK
-        inspec.freq = 22050;
-        #else
+        //inspec.freq = 11025;
+        //inspec.freq = 22050;
         inspec.freq = 44100;
         #if !defined(PSRC_USESDL1) && PLATFORM != PLAT_EMSCR
         flags = SDL_AUDIO_ALLOW_FREQUENCY_CHANGE;
-        #endif
         #endif
     }
     tmp = cfg_getvar(&config, "Audio", "buffer");
@@ -2196,18 +2192,10 @@ bool startAudio(void) {
     audiostate.channels = outspec.channels;
     tmp = cfg_getvar(&config, "Audio", "decodewhole");
     if (tmp) {
-        #if PLATFORM != PLAT_NXDK
         audiostate.soundrcopt.decodewhole = strbool(tmp, true);
-        #else
-        audiostate.soundrcopt.decodewhole = strbool(tmp, false);
-        #endif
         free(tmp);
     } else {
-        #if PLATFORM != PLAT_NXDK
         audiostate.soundrcopt.decodewhole = true;
-        #else
-        audiostate.soundrcopt.decodewhole = false;
-        #endif
     }
     //audiostate.soundspeedmul = (float)outspec.freq / 343.0f;
     audiostate.soundspeedmul = (float)outspec.freq / 400.0f;

@@ -1,17 +1,11 @@
-# TitaniumSrc<img src="https://raw.githubusercontent.com/PQCraft/PlatinumSrc/master/internal/engine/resources/icons/logo.png" align="right" height="120"/>
-**A Community Developed Fork of [PlatinumSrc](https://github.com/PlatinumSrc/PlatinumSrc) inspired by GoldSrc and Quake**<br>
+# TitaniumSrc<img src="https://raw.githubusercontent.com/TitaniumSrc/TitaniumSrc/master/internal/engine/resources/icons/logo.png" align="right" height="120"/>
+**A community-developed fork of [PlatinumSrc](https://github.com/PlatinumSrc/PlatinumSrc)**<br>
 Progress can be found [here](TODO.md)
 
 ---
 - [Platform Support](#platform-support)
 - [How to run](#how-to-run)
 - [Building from source](#building-from-source)
-
----
-### Demo video
-Using [H-74](https://github.com/PQCraft/H-74), and [test_model.p3m](https://github.com/PQCraft/PQCraft/raw/master/test_model.p3m) in `games/test/`
-
-https://github.com/user-attachments/assets/34b922c1-5fe6-409b-96fd-51a7227429c0
 
 ---
 ### Platform Support
@@ -36,7 +30,7 @@ https://github.com/user-attachments/assets/34b922c1-5fe6-409b-96fd-51a7227429c0
 <details open><summary><b>Running the engine</b></summary>
 
 1. Download a game \(the engine will not run without a game\)
-    - [H-74](https://github.com/PQCraft/H-74)
+    <!-- [insert game](...) -->
 2. Drop the game into a directory called `games` and use the `-game` option, or ensure the `defaultgame` variable in `internal/engine/config.cfg` is set to the game's directory name
 3. Put any mods into a directory called `mods` and use the `-mods` option, or ensure they are listed in the `mods` variable in one of the configs
     - You can use `config.cfg` in `internal/engine/` or in the game's user data directory
@@ -95,45 +89,6 @@ https://github.com/user-attachments/assets/34b922c1-5fe6-409b-96fd-51a7227429c0
 - Install Emscripten
 - Pass `CROSS=emscr` to the Makefile
 </details>
-<details><summary><b>Building for the Xbox using the NXDK</b></summary>
-
-- Set up the [NXDK](https://github.com/XboxDev/nxdk)
-    - [The modified CXBE from PR #655 is needed](https://github.com/PQCraft/nxdk/tree/master/tools/cxbe)
-    - [The extract-xiso symlink fixes are recommended](https://github.com/PQCraft/extract-xiso)
-    - [See here for NXDK's dependencies](https://github.com/XboxDev/nxdk/wiki/Install-the-Prerequisites)
-- Set up [XGU](https://github.com/dracc/xgu)
-    1. Go to the NXDK directory
-    2. Go into the `lib/` directory
-    3. Clone XGU into an `xgu/` directory
-- Set up the `xiso` directory
-    1. Create a directory called `xiso`
-    2. Copy \(or symlink\) the `internal` directory into `xiso/`
-    3. Copy \(or symlink\) the games and/or mods you want to include in the disc image
-        - There should be a directory \(or link\) called `games`, and if you have mods, a directory \(or link\) called `mods`
-- Pass `CROSS=nxdk` to the Makefile
-</details>
-<details><summary><b>Building for the Dreamcast using KallistiOS</b></summary>
-
-- Set up [KallistiOS](http://gamedev.allusion.net/softprj/kos)
-    - See [this wiki page](https://dreamcast.wiki/Getting_Started_with_Dreamcast_development) for a tutorial
-- Set up [img4dc](https://github.com/Kazade/img4dc)
-    1. Go into the KallistiOS directory
-    2. Go into `utils/`
-    3. Git clone `https://github.com/Kazade/img4dc`
-    4. Enter `img4dc/` and build it
-- Set up the `cdi` directory
-    1. Create a directory called `cdi`
-    2. Copy \(or symlink\) the `internal` directory into `cdi/`
-    3. Copy \(or symlink\) the games and/or mods you want to include in the disc image
-- Pass `CROSS=dc` to the Makefile
-</details>
-<!--
-<details><summary><b>Building for the PlayStation 2 using the ps2dev sdk</b></summary>
-- Set up the [ps2dev SDK](https://github.com/ps2dev/ps2dev)
-    - See [this forum post](https://www.ps2-home.com/forum/viewtopic.php?t=9488) for a tutorial
-- Pass `CROSS=ps2` to the Makefile
-</details>
--->
 
 ———
 <details><summary><b>Full Makefile usage</b></summary>
@@ -154,14 +109,6 @@ https://github.com/user-attachments/assets/34b922c1-5fe6-409b-96fd-51a7227429c0
             - `win32` - Windows 2000+ or Windows 98 with KernelEx
             - `android` - Android
             - `emscr` - Emscripten
-            - `nxdk` - Xbox using the NXDK
-            - `dc` - Dreamcast using KallistiOS
-            <!--
-            - `ps2` - PS2 using ps2dev
-            - `3ds` - 3DS using devkitPro
-            - `wii` - PS2 using devkitPro
-            - `gc` - PS2 using devkitPro
-            -->
         - `ONLYBIN` - Set to `y` to skip making a disc image.
         - `O` - Set the optimization level \(default is `2` if `DEBUG` is unset or `g` if `DEBUG` is set\)
         - `M32` - Set to `y` to produce a 32-bit binary
@@ -217,19 +164,6 @@ https://github.com/user-attachments/assets/34b922c1-5fe6-409b-96fd-51a7227429c0
             - `WINDRES` - Windows resource compiler
         - Emscripten
             - `EMSCR_SHELL` - Path to the shell file
-        - NXDK
-            - `XBE_TITLE` - XBE title and XISO name \(default is `PlatinumSrc`\)
-            - `XBE_TITLEID` - XBE title ID \(default is `PQ-001`\)
-            - `XBE_VERSION` - XBE version \(default is taken from `version.h`\)
-            - `XBE_XTIMAGE` - Path to XPR image \(default is `icons/engine.xpr`\)
-            - `XISO` - Path to write XISO to \(default is `$(OUTDIR)/$(XBE_TITLE).xiso.iso`\)
-            - `XISODIR` - Path to make the XISO from \(default is `$(OUTDIR)/xiso`\)
-        - Dreamcast
-            - `IP_TITLE` - IP.BIN title and CDI name \(default is `PlatinumSrc`\)
-            - `IP_COMPANY` - IP.BIN company name \(default is `PQCraft`\)
-            - `IP_MRIMAGE` - Path to MR image \(default is `icons/engine.mr`\)
-            - `CDI` - Path to write CDI to \(default is `$(OUTDIR)/$(IP_TITLE).cdi`\)
-            - `CDIDIR` - Path to make the CDI from \(default is `$(OUTDIR)/cdi`\)
 </details>
 
 Examples:

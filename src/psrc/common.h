@@ -57,15 +57,15 @@ extern char* dirdesc[DIR__COUNT];
 extern struct cfg config;
 
 #define PSRC_COMMON_PBPREPROCVARS_BASE \
-    {.name = "psrc:build", .namecrc = 0xB52F9B10, .data.type = PB_PREPROC_TYPE_U32, .data.u32 = PSRC_BUILD},\
-    {.name = "psrc:module:engine", .namecrc = 0x18735912, .data.type = PB_PREPROC_TYPE_U8, .data.u8 = 0},\
-    {.name = "psrc:module:server", .namecrc = 0xAAB69669, .data.type = PB_PREPROC_TYPE_U8, .data.u8 = 1},\
-    {.name = "psrc:module:editor", .namecrc = 0x3C2AB225, .data.type = PB_PREPROC_TYPE_U8, .data.u8 = 2}
+    {.name = "tisrc:build", .namecrc = 0xB52F9B10, .data.type = PB_PREPROC_TYPE_U32, .data.u32 = TISRC_BUILD},\
+    {.name = "tisrc:module:engine", .namecrc = 0x18735912, .data.type = PB_PREPROC_TYPE_U8, .data.u8 = 0},\
+    {.name = "tisrc:module:server", .namecrc = 0xAAB69669, .data.type = PB_PREPROC_TYPE_U8, .data.u8 = 1},\
+    {.name = "tisrc:module:editor", .namecrc = 0x3C2AB225, .data.type = PB_PREPROC_TYPE_U8, .data.u8 = 2}
 #define PSRC_COMMON_PBPREPROCVARCT_BASE (4)
 
 #if DEBUG(0)
     #define PSRC_COMMON_PBPREPROCVARS_DEBUG \
-        {.name = "psrc:debug", .namecrc = 0x642A2E6C, .data.type = PB_PREPROC_TYPE_U8, .data.u8 = PSRC_DBGLVL},
+        {.name = "tisrc:debug", .namecrc = 0x642A2E6C, .data.type = PB_PREPROC_TYPE_U8, .data.u8 = PSRC_DBGLVL},
     #define PSRC_COMMON_PBPREPROCVARCT_DEBUG (1)
 #else
     #define PSRC_COMMON_PBPREPROCVARS_DEBUG

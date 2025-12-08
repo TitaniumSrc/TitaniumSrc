@@ -187,7 +187,6 @@ static void updateWindowMode(enum rendmode newmode) {
     }
 }
 
-#if PLATFORM != PLAT_NXDK
 static void updateWindowIcon(void) {
     if (!rendstate.icon) return;
     int w, h, c;
@@ -211,7 +210,6 @@ static void updateWindowIcon(void) {
         plog(LL_WARN, "Failed to set window icon");
     }
 }
-#endif
 
 #ifndef PSRC_USESDL1
 #define SDL_SetHint(n, v) if (!SDL_SetHint((n), (v))) plog(LL_WARN, "Failed to set " #n " to %s: %s", (char*)(v), SDL_GetError())
@@ -234,11 +232,7 @@ static bool createWindow(void) {
     #endif
     unsigned flags;
     #ifndef PSRC_USESDL1
-    #if PLATFORM != PLAT_NXDK
     flags = SDL_WINDOW_RESIZABLE;
-    #else
-    flags = 0;
-    #endif
     {
         SDL_DisplayMode dtmode;
         SDL_GetDesktopDisplayMode(0, &dtmode);
@@ -307,9 +301,7 @@ static bool createWindow(void) {
     }
     SDL_WM_SetCaption(titlestr, NULL);
     #endif
-    #if PLATFORM != PLAT_NXDK
     updateWindowIcon();
-    #endif
     if (!afterCreateWindow()) {
         rendstate.api = RENDAPI__INVALID;
         destroyWindow();
@@ -414,9 +406,7 @@ bool updateRendererConfig(enum rendopt opt, ...) {
             case RENDOPT_ICON: {
                 free(rendstate.icon);
                 rendstate.icon = strdup(va_arg(args, char*));
-                #if PLATFORM != PLAT_NXDK
                 updateWindowIcon();
-                #endif
             } break;
             case RENDOPT_API: {
                 enum rendapi oldapi = rendstate.api;
@@ -537,8 +527,6 @@ bool initRenderer(void) {
     tmp = cfg_getvar(&config, "Renderer", "resolution.windowed");
     #if PLATFORM == PLAT_EMSCR
     rendstate.res.windowed = (struct rendres){960, 720};
-    #elif PLATFORM == PLAT_NXDK || PLATFORM == PLAT_DREAMCAST
-    rendstate.res.windowed = (struct rendres){640, 480};
     #else
     rendstate.res.windowed = (struct rendres){800, 600};
     #endif

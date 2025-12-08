@@ -62,11 +62,11 @@ debmake() {
 
 # Platforms that require disc images or similar file storage methods will not be included here (Emscripten, Dreamcast, etc.).
 build_engine() {
-    BASE="psrc_engine"
+    BASE="tisrc_engine"
 
     ARCHIVER=_tar_u
 
-    FILES=(psrc)
+    FILES=(tisrc)
     OUTPUT="${BASE}_${FPLATDESC}"
     MAKE=debmake buildrel "${1}" "${PLATDESC}" "${@:2}"
     OUTPUT="${BASE}_${FPLATDESC32}"
@@ -74,7 +74,7 @@ build_engine() {
 
     ARCHIVER=_zip_u
 
-    FILES=(psrc.exe)
+    FILES=(tisrc.exe)
     OUTPUT="${BASE}_windows_x86_64"
     buildrel "${1}" "Windows x86_64" "${@:2}" CROSS=win32 TOOLCHAIN=x86_64-w64-mingw32-
     OUTPUT="${BASE}_windows_i686"
@@ -87,37 +87,37 @@ build_engine() {
     buildrel "${1}" "Xbox (NXDK)" "${@:2}" CROSS=nxdk
 }
 build_server() {
-    BASE="psrc_server"
+    BASE="tisrc_server"
 
     ARCHIVER=_tar_u
 
-    FILES=(psrc-server)
+    FILES=(tisrc-server)
     OUTPUT="${BASE}_${FPLATDESC}"
     MAKE=debmake buildrel "${1}" "${PLATDESC}" "${@:2}"
 
     ARCHIVER=_zip_u
 
-    FILES=(psrc-server.exe)
+    FILES=(tisrc-server.exe)
     OUTPUT="${BASE}_windows_i686"
     buildrel "${1}" "Windows i686" "${@:2}" CROSS=win32 M32=y TOOLCHAIN='wine '
 }
 build_editor() {
-    BASE="psrc_editor"
+    BASE="tisrc_editor"
 
     ARCHIVER=_tar_u
 
-    FILES=(psrc-editor)
+    FILES=(tisrc-editor)
     OUTPUT="${BASE}_${FPLATDESC}"
     MAKE=debmake buildrel "${1}" "${PLATDESC}" "${@:2}"
 
     ARCHIVER=_zip_u
 
-    FILES=(psrc-editor.exe)
+    FILES=(tisrc-editor.exe)
     OUTPUT="${BASE}_windows_i686"
     buildrel "${1}" "Windows i686" "${@:2}" CROSS=win32 M32=y TOOLCHAIN='wine '
 }
 build_tools() {
-    BASE="psrc_tools"
+    BASE="tisrc_tools"
 
     ARCHIVER=_tar
 

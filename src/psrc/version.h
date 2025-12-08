@@ -3,14 +3,11 @@
 
 #include "platform.h"
 
-#define PSRC_BUILD 2025091600
+#define TISRC_BUILD 2025120800
 
 extern char* titlestr;
 extern char verstr[];
 extern char platstr[];
-#if PLATFORM == PLAT_NXDK
-extern char titleidstr[9];
-#endif
 
 void makeVerStrs(void);
 

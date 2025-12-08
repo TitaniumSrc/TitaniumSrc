@@ -1,2 +1,2 @@
 #!/bin/bash
-rm -rf psrc_*.tar.gz psrc_*.zip
+rm -rf tisrc_*.tar.gz tisrc_*.zip

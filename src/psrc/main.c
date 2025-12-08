@@ -30,64 +30,13 @@
 #include <math.h>
 #if PLATFORM == PLAT_ANDROID
     #include <android/log.h>
-#elif PLATFORM == PLAT_NXDK
-    #include <xboxkrnl/xboxkrnl.h>
-    #include <winapi/winnt.h>
-    #include <hal/video.h>
 #elif (PLATFLAGS & PLATFLAG_WINDOWSLIKE)
     #include <windows.h>
 #elif PLATFORM == PLAT_EMSCR
     #include <emscripten.h>
-#elif PLATFORM == PLAT_DREAMCAST
-    #include <kos.h>
-    #include <dirent.h>
-    #define PSRC_KOS_INIT_FLAGS (INIT_IRQ | INIT_NET | INIT_DEFAULT_ARCH | INIT_NO_DCLOAD)
-    #if DEBUG(0)
-    KOS_INIT_FLAGS(PSRC_KOS_INIT_FLAGS);
-    #else
-    KOS_INIT_FLAGS(PSRC_KOS_INIT_FLAGS | INIT_QUIET);
-    #endif
-    #undef PSRC_KOS_INIT_FLAGS
-#elif PLATFORM == PLAT_3DS
-    #include <3ds.h>
-    #include <dirent.h>
-#elif PLATFORM == PLAT_WII || PLATFORM == PLAT_GAMECUBE
-    #include <fat.h>
-    #include <dirent.h>
 #endif
 
 #include "glue.h"
-
-#if PLATFORM == PLAT_NXDK && PSRC_MTLVL >= 2
-static thread_t watchdogthread;
-static volatile bool killwatchdog;
-static void* watchdog(struct thread_data* td) {
-    plog(LL_INFO, "Watchdog armed for %u seconds", (unsigned)td->args);
-    uint64_t t = altutime() + (uint64_t)(td->args) * 1000000;
-    while (t > altutime()) {
-        if (killwatchdog) {
-            killwatchdog = false;
-            plog(LL_INFO, "Watchdog cancelled");
-            return NULL;
-        }
-        yield();
-    }
-    HalReturnToFirmware(HalRebootRoutine);
-    return NULL;
-}
-static void armWatchdog(unsigned sec) {
-    createThread(&watchdogthread, "watchdog", watchdog, (void*)sec);
-}
-static void cancelWatchdog(void) {
-    killwatchdog = true;
-    destroyThread(&watchdogthread, NULL);
-}
-static void rearmWatchdog(unsigned sec) {
-    killwatchdog = true;
-    destroyThread(&watchdogthread, NULL);
-    createThread(&watchdogthread, "watchdog", watchdog, (void*)sec);
-}
-#endif
 
 #if defined(PSRC_MODULE_ENGINE)
     #include "engine/engine.h"
@@ -231,10 +180,6 @@ int main(int argc, char** argv) {
     #elif PLATFORM == PLAT_ANDROID
         __android_log_write(ANDROID_LOG_INFO, "PlatinumSrc", verstr);
         __android_log_write(ANDROID_LOG_INFO, "PlatinumSrc", platstr);
-    #elif PLATFORM == PLAT_NXDK
-        pb_print("%s\n", verstr);
-        pb_print("%s\n", platstr);
-        pbgl_swap_buffers();
     #endif
 
     if (!initLogging()) {
@@ -281,13 +226,8 @@ int main(int argc, char** argv) {
             else if (tmrres > tc.wPeriodMax) tmrres = tc.wPeriodMax;
         }
         timeBeginPeriod(tmrres);
-    #elif PLATFORM == PLAT_WII
-        fatInitDefault();
     #endif
-    #if PLATFORM == PLAT_NXDK
-        perfctfreq = KeQueryPerformanceFrequency();
-        XVideoSetMode(640, 480, 32, REFRESH_DEFAULT);
-    #elif (PLATFLAGS & PLATFLAG_WINDOWSLIKE)
+    #if (PLATFLAGS & PLATFLAG_WINDOWSLIKE)
         QueryPerformanceFrequency(&perfctfreq);
         while (!(perfctfreq.QuadPart % 10) && !(perfctmul % 10)) {
             perfctfreq.QuadPart /= 10;
@@ -318,12 +258,6 @@ int main(int argc, char** argv) {
 
     #if PLATFORM == PLAT_WIN32
         timeEndPeriod(tmrres);
-    #elif PLATFORM == PLAT_NXDK
-        if (ret) Sleep(5000);
-        pbgl_shutdown();
-        HalReturnToFirmware(HalQuickRebootRoutine);
-    #elif PLATFORM == PLAT_DREAMCAST
-        arch_menu();
     #endif
 
     return ret;

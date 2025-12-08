@@ -4,25 +4,17 @@
 
 #include <stddef.h>
 #include <ctype.h>
-#if PLATFORM != PLAT_NXDK
-    #include <errno.h>
-    #if PLATFORM == PLAT_DREAMCAST
-        #include <dirent.h>
-    #else
-        #include <sys/types.h>
-        #include <sys/stat.h>
-        #if !(PLATFLAGS & PLATFLAG_WINDOWSLIKE)
-            #include <dirent.h>
-            #include <unistd.h>
-        #else
-            #include <windows.h>
-        #endif
-        #ifndef PSRC_USESDL1
-            #include "incsdl.h"
-        #endif
-    #endif
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#if !(PLATFLAGS & PLATFLAG_WINDOWSLIKE)
+    #include <dirent.h>
+    #include <unistd.h>
 #else
     #include <windows.h>
+#endif
+#ifndef PSRC_USESDL1
+    #include "incsdl.h"
 #endif
 #include <stdio.h>
 #include <stdbool.h>
@@ -152,7 +144,6 @@ void sanfilename_cb(const char* s, char r, struct charbuf* cb) {
         else cb_add(cb, c);
         ++s;
     }
-    // TODO: confirm that checking for illegal names can be omitted on PLAT_NXDK
     #if (PLATFLAGS & PLATFLAG_WINDOWSLIKE)
     if (b == cb->len) return;
     size_t i = b;
@@ -269,11 +260,7 @@ bool md(const char* p) {
             int t = isFile(cb.data);
             if (t < 0) {
                 bool cond;
-                #if PLATFORM != PLAT_NXDK
                 cond = (mkdir(cb.data) < 0 && errno != EEXIST);
-                #else
-                cond = (!CreateDirectory(cb.data, NULL) && GetLastError() != ERROR_ALREADY_EXISTS);
-                #endif
                 if (cond) {
                     cb_dump(&cb);
                     return false;
@@ -354,7 +341,7 @@ char** ls(const char* p, bool ln, size_t* l) {
                 #ifdef S_ISSOCK
                 else if (S_ISSOCK(s.st_mode)) i |= LS_ISSPL;
                 #endif
-                #if defined(S_ISLNK) && PLATFORM != PLAT_DREAMCAST
+                #if defined(S_ISLNK)
                 lstat(names.data + ol, &s);
                 if (S_ISLNK(s.st_mode)) i |= LS_ISLNK;
                 #endif

@@ -1724,7 +1724,7 @@ bool initRcMgr(void) {
         lscache.size = atoi(tmp);
         if (lscache.size < 1) lscache.size = 1;
     } else {
-        #if PLATFORM != PLAT_NXDK && (PLATFLAGS & (PLATFLAG_UNIXLIKE | PLATFLAG_WINDOWSLIKE))
+        #if (PLATFLAGS & (PLATFLAG_UNIXLIKE | PLATFLAG_WINDOWSLIKE))
         lscache.size = 32;
         #else
         lscache.size = 12;

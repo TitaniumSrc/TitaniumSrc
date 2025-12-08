@@ -439,60 +439,28 @@ int bootstrap(void) {
     k = inputKeysFromStr("k,f2");
     newInputAction(INPUTACTIONTYPE_ONCE, "screenshot", k, (void*)ACTION_SCREENSHOT);
     free(k);
-    #if PLATFORM != PLAT_DREAMCAST
     k = inputKeysFromStr("k,w;g,a,-lefty");
-    #else
-    k = inputKeysFromStr("k,w;g,b,y");
-    #endif
     newInputAction(INPUTACTIONTYPE_MULTI, "move_forwards", k, (void*)ACTION_MOVE_FORWARDS);
     free(k);
-    #if PLATFORM != PLAT_DREAMCAST
     k = inputKeysFromStr("k,a;g,a,-leftx");
-    #else
-    k = inputKeysFromStr("k,a;g,b,x");
-    #endif
     newInputAction(INPUTACTIONTYPE_MULTI, "move_left", k, (void*)ACTION_MOVE_LEFT);
     free(k);
-    #if PLATFORM != PLAT_DREAMCAST
     k = inputKeysFromStr("k,s;g,a,+lefty");
-    #else
-    k = inputKeysFromStr("k,s;g,b,a");
-    #endif
     newInputAction(INPUTACTIONTYPE_MULTI, "move_backwards", k, (void*)ACTION_MOVE_BACKWARDS);
     free(k);
-    #if PLATFORM != PLAT_DREAMCAST
     k = inputKeysFromStr("k,d;g,a,+leftx");
-    #else
-    k = inputKeysFromStr("k,d;g,b,b");
-    #endif
     newInputAction(INPUTACTIONTYPE_MULTI, "move_right", k, (void*)ACTION_MOVE_RIGHT);
     free(k);
-    #if PLATFORM != PLAT_DREAMCAST
     k = inputKeysFromStr("m,m,+y;k,up;g,a,-righty");
-    #else
-    k = inputKeysFromStr("m,m,+y;k,up;g,a,-lefty");
-    #endif
     newInputAction(INPUTACTIONTYPE_MULTI, "look_up", k, (void*)ACTION_LOOK_UP);
     free(k);
-    #if PLATFORM != PLAT_DREAMCAST
     k = inputKeysFromStr("m,m,-x;k,left;g,a,-rightx");
-    #else
-    k = inputKeysFromStr("m,m,-x;k,left;g,a,-leftx");
-    #endif
     newInputAction(INPUTACTIONTYPE_MULTI, "look_left", k, (void*)ACTION_LOOK_LEFT);
     free(k);
-    #if PLATFORM != PLAT_DREAMCAST
     k = inputKeysFromStr("m,m,-y;k,down;g,a,+righty");
-    #else
-    k = inputKeysFromStr("m,m,-y;k,down;g,a,+lefty");
-    #endif
     newInputAction(INPUTACTIONTYPE_MULTI, "look_down", k, (void*)ACTION_LOOK_DOWN);
     free(k);
-    #if PLATFORM != PLAT_DREAMCAST
     k = inputKeysFromStr("m,m,+x;k,right;g,a,+rightx");
-    #else
-    k = inputKeysFromStr("m,m,+x;k,right;g,a,+leftx");
-    #endif
     newInputAction(INPUTACTIONTYPE_MULTI, "look_right", k, (void*)ACTION_LOOK_RIGHT);
     free(k);
     #if PLATFORM != PLAT_EMSCR
@@ -502,18 +470,10 @@ int bootstrap(void) {
     #endif
     newInputAction(INPUTACTIONTYPE_MULTI, "walk", k, (void*)ACTION_WALK);
     free(k);
-    #if PLATFORM != PLAT_DREAMCAST
     k = inputKeysFromStr("k,space;g,b,a");
-    #else
-    k = inputKeysFromStr("k,space;g,a,+lefttrigger");
-    #endif
     newInputAction(INPUTACTIONTYPE_MULTI, "jump", k, (void*)ACTION_JUMP);
     free(k);
-    #if PLATFORM != PLAT_DREAMCAST
     k = inputKeysFromStr("k,lshift;g,a,+lefttrigger");
-    #else
-    k = inputKeysFromStr("k,lshift;g,b,dpdown");
-    #endif
     newInputAction(INPUTACTIONTYPE_MULTI, "crouch", k, (void*)ACTION_CROUCH);
     free(k);
 
@@ -551,19 +511,10 @@ int bootstrap(void) {
 void unstrap(void) {
     plog(LL_MS, "Stopping engine...");
 
-    #if PLATFORM == PLAT_NXDK && PSRC_MTLVL >= 2
-    armWatchdog(5);
-    #endif
     plog(LL_INFO, "Stopping audio manager...");
     stopAudio();
-    #if PLATFORM == PLAT_NXDK && PSRC_MTLVL >= 2
-    rearmWatchdog(5);
-    #endif
     plog(LL_INFO, "Stopping renderer...");
     stopRenderer();
-    #if PLATFORM == PLAT_NXDK && PSRC_MTLVL >= 2
-    cancelWatchdog();
-    #endif
 
     rlsRc(mainscript, false);
 
@@ -588,13 +539,7 @@ void unstrap(void) {
         cfg_close(&config);
     }
 
-    #if PLATFORM == PLAT_NXDK && PSRC_MTLVL >= 2
-    armWatchdog(5);
-    #endif
     SDL_Quit();
-    #if PLATFORM == PLAT_NXDK && PSRC_MTLVL >= 2
-    cancelWatchdog();
-    #endif
 
     plog(LL_MS, "Done");
 }
@@ -617,9 +562,6 @@ void loop(void) {
     prof_begin(&dbgprof, DBGPROF_EVENTS);
     #endif
     pollInput();
-    #if PLATFORM == PLAT_3DS
-    if (!aptMainLoop()) ++quitreq;
-    #endif
     #if DEBUG(1)
     prof_end(&dbgprof);
     #endif
