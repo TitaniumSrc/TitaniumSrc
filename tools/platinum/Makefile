@@ -1,3 +1,0 @@
-BIN := platinum
-
-include ../common.mk

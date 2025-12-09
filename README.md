@@ -30,7 +30,7 @@ Progress can be found [here](TODO.md)
 <details open><summary><b>Running the engine</b></summary>
 
 1. Download a game \(the engine will not run without a game\)
-    <!-- [insert game](...) -->
+    - [Demo](https://github.com/TitaniumSrc/demo) - A demo/test game
 2. Drop the game into a directory called `games` and use the `-game` option, or ensure the `defaultgame` variable in `internal/engine/config.cfg` is set to the game's directory name
 3. Put any mods into a directory called `mods` and use the `-mods` option, or ensure they are listed in the `mods` variable in one of the configs
     - You can use `config.cfg` in `internal/engine/` or in the game's user data directory
@@ -133,11 +133,6 @@ Progress can be found [here](TODO.md)
         - `USESDLDS` - Set to `y` to use SDL_RWops functions in place of `open()`, `read()`, and `close()` in the datastream code
         - `USEDISCORDGAMESDK` - Set to `y` to include the Discord Game SDK
         - `USEGL` - Set to `y` to include OpenGL support
-        - `USEGL11` - Set to `y` to include OpenGL 1.1 support
-        - `USEGL33` - Set to `y` to include OpenGL 3.3 support
-        - `USEGLES30` - Set to `y` to include OpenGL ES 3.0 support
-        - `USEGLAD` - Set to `y` to use glad instead of the system's GL library directly
-        - `USEWEAKGL` - Set to `y` to mark `gl[A-Z]*` symbols as weak
         - `USESDL1` - Set to `y` to use SDL 1.2.x instead of SDL 2.x
         - `USESTATICSDL` - Set to `y` to statically link to SDL
         - `USEMINIMP3` - Set to `y` to include MiniMP3 for MP3 support
@@ -147,12 +142,13 @@ Progress can be found [here](TODO.md)
             - `USEWINPTHREAD` - Set to `y` to use winpthread instead of win32 threads
     - Toolchain options
         - `CC` - C compiler
-        - `LD` - Linker \(defaults to `CC`'s value\)
+        - `CXX` - C++ compiler
+        - `LD` - Linker \(defaults to `CXX`'s value\)
         - `AR` - Archiver
         - `STRIP` - Symbol remover
-        - `OBJCOPY` - Executable editor
         - `TOOLCHAIN` - Text to prepend to tool names
         - `CFLAGS` - Extra C compiler flags
+        - `CXXFLAGS` - Extra C++ compiler flags
         - `CPPFLAGS` - Extra C preprocessor flags
         - `LDFLAGS` - Extra linker flags
         - `LDLIBS` - Extra linker libraries
@@ -177,5 +173,5 @@ make -j$(nproc) run
 make DEBUG=1 ASAN=y -j$(nproc) run
 ```
 ```
-make CROSS=nxdk DEBUG=0 -j$(nproc) run
+make CROSS=win32 DEBUG=0 -j$(nproc) run
 ```

@@ -5,13 +5,8 @@
 
 #include "../string.h"
 #include "../common/config.h"
-#include "../common/pbasic.h"
 
 extern struct engine {
-    struct {
-        struct pbasic pb;
-        struct pb_compiler_opt compopt;
-    } pb;
     struct {
         char* game;
         char* mods;

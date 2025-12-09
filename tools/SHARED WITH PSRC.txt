@@ -1,0 +1,6 @@
+The following tools are shared with PlatinumSrc:
+- blender p3m
+- crc
+- paftool
+- platinum
+- ptftool

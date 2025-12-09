@@ -1,39 +1,50 @@
 SRCDIR ?= src
 OBJDIR ?= obj
 OUTDIR ?= .
-PSRCDIR ?= ../../src
+TISRCDIR ?= ../../src
 
-SOURCES ?= $(wildcard $(SRCDIR)/*.c)
-OBJECTS ?= $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SOURCES))
+CSOURCES ?= $(wildcard $(SRCDIR)/*.c)
+COBJECTS ?= $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.c.o,$(SOURCES))
+CXXSOURCES ?= $(wildcard $(SRCDIR)/*.cpp)
+CXXOBJECTS ?= $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.cpp.o,$(SOURCES))
 
 BIN ?= out
-ifeq ($(OS),Windows_NT)
-    BIN := $(BIN).exe
-endif
 
 TARGET := $(OUTDIR)/$(BIN)
+ifeq ($(OS),Windows_NT)
+    TARGET := $(TARGET).exe
+endif
 
 CC ?= gcc
-LD := $(CC)
+CXX ?= g++
+LD := $(CXX)
 STRIP ?= strip
 _CC := $(TOOLCHAIN)$(CC)
+_CXX := $(TOOLCHAIN)$(CXX)
 _LD := $(TOOLCHAIN)$(LD)
 _STRIP := $(TOOLCHAIN)$(STRIP)
 
-CFLAGS += -Wall -Wextra -Wuninitialized -Wundef -I$(PSRCDIR)
+_CFLAGS := $(CFLAGS) -Wall -Wextra -Wuninitialized -Wundef
+_CXXFLAGS := $(CXXFLAGS) -fno-rtti -fno-exceptions
+_CPPFLAGS := $(CPPFLAGS) -I$(TISRCDIR) -DTISRC_REUSABLE
+_LDFLAGS := $(LDFLAGS)
+_LDLIBS := $(LDLIBS)
 ifneq ($(DEBUG),y)
-    CPPFLAGS += -DNDEBUG
+    _CPPFLAGS += -DNDEBUG
     O ?= 2
 else
-    CFLAGS += -g -Wdouble-promotion -fno-omit-frame-pointer -std=c99 -pedantic
+    _CFLAGS += -g -Wdouble-promotion -fno-omit-frame-pointer
     O ?= g
 endif
-CFLAGS += -O$(O)
-ifeq ($(ASAN),y)
-    CFLAGS += -fsanitize=address
-    LDFLAGS += -fsanitize=address
+_CFLAGS += -O$(O)
+_CXXFLAGS += $(_CFLAGS)
+ifeq ($(DEBUG),y)
+    _CFLAGS += -std=c11 -pedantic
 endif
-CPPFLAGS += -DPSRC_REUSABLE
+ifeq ($(ASAN),y)
+    _CFLAGS += -fsanitize=address
+    _LDFLAGS += -fsanitize=address
+endif
 
 .SECONDEXPANSION:
 
@@ -47,10 +58,13 @@ define rmdir
 if [ -d '$(1)' ]; then echo 'Removing $(1)/...'; rm -rf '$(1)'; fi; true
 endef
 
-deps.filter := %.c %.h
+deps.filter := %.c %.cpp %.h %.hpp
 deps.option := -MM
-define deps
-$$(filter $$(deps.filter),,$$(shell $(_CC) $(CFLAGS) $(CPPFLAGS) -E $(deps.option) $(1)))
+define cdeps
+$$(filter $$(deps.filter),,$$(shell $(_CC) $(_CFLAGS) $(_CPPFLAGS) -E $(deps.option) $(1)))
+endef
+define cxxdeps
+$$(filter $$(deps.filter),,$$(shell $(_CC) $(_CPPFLAGS) $(_CPPFLAGS) -E $(deps.option) $(1)))
 endef
 
 default: build
@@ -61,14 +75,19 @@ $(OUTDIR):
 $(OBJDIR):
 	@$(call mkdir,$@)
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.c $(call deps,$(SRCDIR)/%.c) | $(OBJDIR) $(OUTDIR)
+$(OBJDIR)/%.c.o: $(SRCDIR)/%.c $(call cdeps,$(SRCDIR)/%.c) | $(OBJDIR) $(OUTDIR)
 	@echo Compiling $<...
-	@$(_CC) $(CFLAGS) $(CPPFLAGS) $< -c -o $@
+	@$(_CC) $(_CFLAGS) $(_CPPFLAGS) $< -c -o $@
 	@echo Compiled $<
 
-$(TARGET): $(OBJECTS) | $(OUTDIR)
+$(OBJDIR)/%.cpp.o: $(SRCDIR)/%.cpp $(call cxxdeps,$(SRCDIR)/%.cpp) | $(OBJDIR) $(OUTDIR)
+	@echo Compiling $<...
+	@$(_CXX) $(_CXXFLAGS) $(_CPPFLAGS) $< -c -o $@
+	@echo Compiled $<
+
+$(TARGET): $(COBJECTS) $(CXXOBJECTS) | $(OUTDIR)
 	@echo Linking $@...
-	@$(_LD) $(LDFLAGS) $^ $(LDLIBS) -o $@
+	@$(_LD) $(_LDFLAGS) $^ $(_LDLIBS) -o $@
 ifneq ($(NOSTRIP),y)
 	@$(_STRIP) -s -R '.comment' -R '.note.*' -R '.gnu.build-id' $@ || exit 0
 endif

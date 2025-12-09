@@ -20,17 +20,7 @@
 
 #include "../glue.h"
 
-struct engine engine = {
-    .pb = {
-        .compopt = PB_COMPILER_OPT_DEFAULTS,
-        .compopt.errprefix = "    ",
-        .compopt.preprocvars = (struct pb_compiler_opt_preprocvar[]) {
-            PSRC_COMMON_PBPREPROCVARS,
-            {.name = "psrc:module", .namecrc = 0xD2985DF4, .data.type = PB_PREPROC_TYPE_U8, .data.u8 = 0}
-        },
-        .compopt.preprocvarct = PSRC_COMMON_PBPREPROCVARCT + 1
-    }
-};
+struct engine engine;
 
 void setupBaseDirs(void) {
     if (engine.opt.maindir) {

@@ -15,13 +15,13 @@ endif
 
 ifeq ($(CROSS),)
     CC ?= gcc
-    LD := $(CC)
+    CXX ?= g++
+    LD := $(CXX)
     STRIP ?= strip
-    OBJCOPY ?= objcopy
     _CC := $(TOOLCHAIN)$(CC)
+    _CXX := $(TOOLCHAIN)$(CXX)
     _LD := $(TOOLCHAIN)$(LD)
     _STRIP := $(TOOLCHAIN)$(STRIP)
-    _OBJCOPY := $(TOOLCHAIN)$(OBJCOPY)
     ifneq ($(M32),y)
         PLATFORM := $(subst $() $(),_,$(subst /,_,$(shell uname -o 2> $(null) || uname -s; uname -m)))
     else
@@ -31,11 +31,7 @@ ifeq ($(CROSS),)
     USEGL := y
     KERNEL := $(shell uname -s)
     ifeq ($(KERNEL),Darwin)
-        USEGLAD := y
         NOGCSECTIONS := y
-    endif
-    ifneq ($(USEGLAD),y)
-        USEWEAKGL := y
     endif
 else ifeq ($(CROSS),win32)
     ifneq ($(M32),y)
@@ -50,18 +46,17 @@ else ifeq ($(CROSS),win32)
         PLATFORM := Windows_i686
     endif
     CC := gcc
-    LD := $(CC)
+    CXX := g++
+    LD := $(CXX)
     STRIP := strip
-    OBJCOPY := objcopy
     WINDRES := windres
     _CC := $(TOOLCHAIN)$(CC)
+    _CXX := $(TOOLCHAIN)$(CXX)
     _LD := $(TOOLCHAIN)$(LD)
     _STRIP := $(TOOLCHAIN)$(STRIP)
-    _OBJCOPY := $(TOOLCHAIN)$(OBJCOPY)
     _WINDRES := $(TOOLCHAIN)$(WINDRES)
     USESR := y
     USEGL := y
-    USEGLAD := y
     USESTATICSDL := y
 else ifeq ($(CROSS),android)
     ifeq ($(MODULE),engine)
@@ -70,12 +65,12 @@ else ifeq ($(CROSS),android)
     endif
     PLATFORM := Android
     _CC := $(CC)
-    _LD := $(_CC)
+    _CXX := $(CXX)
+    _LD := $(_CXX)
     NOLTO := y
     NOSTRIP := y
     NOGCSECTIONS := y
-    USEGLES30 := y
-    USEGLAD := y
+    USEGL := y
     USESTDTHREAD := y
     USESDLDS := y
 else ifeq ($(CROSS),emscr)
@@ -85,12 +80,13 @@ else ifeq ($(CROSS),emscr)
     endif
     PLATFORM := Emscripten
     _CC := emcc
-    _LD := $(_CC)
+    _CXX := em++
+    _LD := $(_CXX)
     EMULATOR := emrun
     EMUPATHFLAG := --
     NOSTRIP := y
     MT := 0
-    USEGL11 := y
+    USEGL := y
 else
     $(error Invalid cross-compilation target: $(CROSS))
 endif
@@ -135,22 +131,12 @@ else
     SOSUF := .so
 endif
 
-ifeq ($(USEGL),y)
-    USEGL11 := y
-    USEGL33 := y
-    USEGLES30 := y
-else ifeq ($(USEGL11),y)
-    USEGL := y
-else ifeq ($(USEGL33),y)
-    USEGL := y
-else ifeq ($(USEGLES30),y)
-    USEGL := y
-endif
 ifeq ($(MTLVL),)
     MTLVL := 2
 endif
 
 _CFLAGS := $(CFLAGS) -I$(EXTDIR)/$(PLATFORM)/include -I$(EXTDIR)/include -fno-exceptions -Wall -Wextra -Wuninitialized -Wundef -fvisibility=hidden
+_CXXFLAGS := $(CXXFLAGS) -fno-rtti -fno-exceptions
 _CPPFLAGS := $(CPPFLAGS) -DPSRC_MTLVL=$(MTLVL) -D_DEFAULT_SOURCE -D_GNU_SOURCE
 _LDFLAGS := $(LDFLAGS) -L$(EXTDIR)/$(PLATFORM)/lib -L$(EXTDIR)/lib
 _LDLIBS := $(LDLIBS) -lm
@@ -185,41 +171,18 @@ else ifeq ($(CROSS),emscr)
         _LDFLAGS += -sLEGACY_GL_EMULATION -sGL_UNSAFE_OPTS=0
     endif
     _LDFLAGS += --embed-file internal/engine/ --embed-file internal/server/ --embed-file games/ --embed-file mods/
-else ifeq ($(CROSS),3ds)
-    _CFLAGS += -march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft -mword-relocations -ffunction-sections -I$(DEVKITPRO)/libctru/include -I$(DEVKITPRO)/portlibs/3ds/include
-    _CPPFLAGS += -D__3DS__
-    _LDFLAGS += -specs=3dsx.specs -march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft -L$(DEVKITPRO)/libctru/lib -L$(DEVKITPRO)/portlibs/3ds/lib
-    _LDLIBS += -lcitro2d -lcitro3d
-else ifeq ($(CROSS),wii)
-    _CFLAGS += -mrvl -mcpu=750 -meabi -mhard-float -I$(DEVKITPRO)/libogc/include -I$(DEVKITPRO)/portlibs/wii/include
-    _CPPFLAGS += -DGEKKO -D__wii__
-    _LDFLAGS += -mrvl -mcpu=750 -meabi -mhard-float -L$(DEVKITPRO)/libogc/lib/wii -L$(DEVKITPRO)/portlibs/wii/lib
-    _LDLIBS += -lfat
-else ifeq ($(CROSS),gc)
-    _CFLAGS += -mogc -mcpu=750 -meabi -mhard-float -I$(DEVKITPRO)/libogc/include -I$(DEVKITPRO)/portlibs/gamecube/include
-    _CPPFLAGS += -DGEKKO -D__gamecube__
-    _LDFLAGS += -mogc -mcpu=750 -meabi -mhard-float -L$(DEVKITPRO)/libogc/lib/cube -L$(DEVKITPRO)/portlibs/gamecube/lib
-endif
-ifeq ($(USEGL),y)
-    ifeq ($(USEGLAD),y)
-        _CPPFLAGS += -DPSRC_ENGINE_RENDERER_GL_USEGLAD
-    else
-        _LDLIBS += -lGL
-    endif
 endif
 ifneq ($(MT),0)
     ifneq ($(USESTDTHREAD),y)
         ifneq ($(CROSS),win32)
-            ifneq ($(CROSS),dc)
-                _CFLAGS += -pthread
-            endif
+            _CFLAGS += -pthread
+            _LDFLAGS += -pthread
             _LDLIBS += -lpthread
-        else
-            ifeq ($(USEWINPTHREAD),y)
-                _CFLAGS += -pthread
-                _CPPFLAGS += -DPSRC_THREADING_USEWINPTHREAD
-                _LDLIBS += -l:libwinpthread.a
-            endif
+        else ifeq ($(USEWINPTHREAD),y)
+            _CFLAGS += -pthread
+            _LDFLAGS += -pthread
+            _CPPFLAGS += -DPSRC_THREADING_USEWINPTHREAD
+            _LDLIBS += -l:libwinpthread.a
         endif
     endif
 endif
@@ -266,15 +229,6 @@ endif
 ifeq ($(USEGL),y)
     _CPPFLAGS += -DPSRC_ENGINE_RENDERER_USEGL
 endif
-ifeq ($(USEGL11),y)
-    _CPPFLAGS += -DPSRC_ENGINE_RENDERER_GL_USEGL11
-endif
-ifeq ($(USEGL33),y)
-    _CPPFLAGS += -DPSRC_ENGINE_RENDERER_GL_USEGL33
-endif
-ifeq ($(USEGLES30),y)
-    _CPPFLAGS += -DPSRC_ENGINE_RENDERER_GL_USEGLES30
-endif
 ifndef DEBUG
     _CPPFLAGS += -DNDEBUG=1
     ifneq ($(NOGCSECTIONS),y)
@@ -303,9 +257,6 @@ else
     endif
     _CFLAGS += -O$(O) -g -Wdouble-promotion -fno-omit-frame-pointer
     #_CFLAGS += -Wconversion
-    ifneq ($(CROSS),emscr)
-        _CFLAGS += -std=c11 -pedantic
-    endif
     ifeq ($(CROSS),win32)
         _WRFLAGS += -DPSRC_DBGLVL=$(DEBUG)
     endif
@@ -377,12 +328,6 @@ ifneq ($(USESDL1),y)
         endif
         ifeq ($(CROSS),win32)
             LDLIBS.lib.SDL += -lole32 -loleaut32 -limm32 -lsetupapi -lversion -lgdi32 -lwinmm
-        else ifeq ($(CROSS),3ds)
-            LDLIBS.lib.SDL += -lm
-        else ifeq ($(CROSS),wii)
-            LDLIBS.lib.SDL += -lwiiuse -lwiikeyboard -lbte -laesnd -lm
-        else ifeq ($(CROSS),gc)
-            LDLIBS.lib.SDL += -laesnd -lm
         endif
     endif
 else
@@ -424,6 +369,13 @@ else ifeq ($(MODULE),editor)
     _CPPFLAGS += $(CPPFLAGS.lib.SDL) $(CPPFLAGS.lib.discord_game_sdk)
     _LDLIBS += $(LDLIBS.dir.psrc_engine) $(LDLIBS.dir.psrc)
     _LDLIBS += $(LDLIBS.lib.discord_game_sdk) $(LDLIBS.lib.SDL)
+endif
+
+_CXXFLAGS += $(_CFLAGS)
+ifdef DEBUG
+    ifneq ($(CROSS),emscr)
+        _CFLAGS += -std=c11 -pedantic
+    endif
 endif
 
 ifeq ($(MODULE),server)
@@ -484,10 +436,13 @@ endif
 
 .SECONDEXPANSION:
 
-deps.filter := %.c %.h
+deps.filter := %.c %.cpp %.h %.hpp
 deps.option := -MM
-define deps
+define cdeps
 $$(filter $$(deps.filter),,$$(shell $(_CC) $(_CFLAGS) $(_CPPFLAGS) -E $(deps.option) $(1)))
+endef
+define cxxdeps
+$$(filter $$(deps.filter),,$$(shell $(_CXX) $(_CXXFLAGS) $(_CPPFLAGS) -E $(deps.option) $(1)))
 endef
 
 ifeq ($(TR),y)
@@ -517,17 +472,19 @@ ifneq ($(MODULE),server)
     ifeq ($(USEPLMPEG),y)
         SRCDIRS := $(SRCDIRS) $(SRCDIR)/pl_mpeg
     endif
-    ifeq ($(USEGL),y)
-        ifeq ($(USEGLAD),y)
+    ifneq ($(CROSS),emscr)
+        ifeq ($(USEGL),y)
             SRCDIRS := $(SRCDIRS) $(SRCDIR)/glad
         endif
     endif
 endif
 
 SRCDIRS := $(SRCDIRS)
-SOURCES := $(wildcard $(addsuffix /*.c,$(SRCDIRS)))
+CSOURCES := $(wildcard $(addsuffix /*.c,$(SRCDIRS)))
+CXXSOURCES := $(wildcard $(addsuffix /*.cpp,$(SRCDIRS)))
 OBJDIRS := $(patsubst $(SRCDIR)/%,$(_OBJDIR)/%,$(SRCDIRS))
-OBJECTS := $(patsubst $(SRCDIR)/%.c,$(_OBJDIR)/%.o,$(SOURCES))
+COBJECTS := $(patsubst $(SRCDIR)/%.c,$(_OBJDIR)/%.c.o,$(CSOURCES))
+CXXOBJECTS := $(patsubst $(SRCDIR)/%.cpp,$(_OBJDIR)/%.cpp.o,$(CXXSOURCES))
 
 $(OUTDIR):
 	@$(call mkdir,$@)
@@ -535,12 +492,17 @@ $(OUTDIR):
 $(_OBJDIR):
 	@$(call mkdir,$@ $(OBJDIRS))
 
-$(_OBJDIR)/%.o: $(SRCDIR)/%.c $(call deps,$(SRCDIR)/%.c) | $(_OBJDIR) $(TR_FILE)
+$(_OBJDIR)/%.c.o: $(SRCDIR)/%.c $(call cdeps,$(SRCDIR)/%.c) | $(_OBJDIR) $(TR_FILE)
 	@echo Compiling $(patsubst $(SRCDIR)/%,%,$<)...
 	@$(_TR_BEFORE) $(_CC) $(_CFLAGS) $(_CPPFLAGS) $< -c -o $@ $(_TR_AFTER)
 	@echo Compiled $(patsubst $(SRCDIR)/%,%,$<)
 
-$(BINPATH): $(OBJECTS) | $(OUTDIR)
+$(_OBJDIR)/%.cpp.o: $(SRCDIR)/%.cpp $(call cxxdeps,$(SRCDIR)/%.cpp) | $(_OBJDIR) $(TR_FILE)
+	@echo Compiling $(patsubst $(SRCDIR)/%,%,$<)...
+	@$(_TR_BEFORE) $(_CXX) $(_CFLAGS) $(_CPPFLAGS) $< -c -o $@ $(_TR_AFTER)
+	@echo Compiled $(patsubst $(SRCDIR)/%,%,$<)
+
+$(BINPATH): $(COBJECTS) $(CXXOBJECTS) | $(OUTDIR)
 ifeq ($(TR),y)
 	@sort -r -k2 $(TR_FILE) -o $(TR_FILE)
 	@printf '%s\n' '-------------------------------------' >> $(TR_FILE)
@@ -560,9 +522,6 @@ else
 	@$(_LD) $(_LDFLAGS) $^ $(_WROBJ) $(_LDLIBS) -o $@
 ifneq ($(NOSTRIP),y)
 	-@$(_STRIP) -s -R '.comment' -R '.note.*' -R '.gnu.build-id' $@ || $(_STRIP) -s $@
-endif
-ifeq ($(USEWEAKGL),y)
-	-@$(_OBJCOPY) -w -W 'gl[A-Z]*' $@
 endif
 endif
 	@echo Linked $@

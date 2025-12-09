@@ -1,13 +1,7 @@
 #include "renderer.h"
 
-#ifdef PSRC_ENGINE_RENDERER_USESR
-    #include "renderer_sw.h"
-#endif
 #ifdef PSRC_ENGINE_RENDERER_USEGL
     #include "renderer_gl.h"
-#endif
-#ifdef PSRC_ENGINE_RENDERER_USEXGU
-    #include "renderer_xgu.h"
 #endif
 
 #include "../version.h"
@@ -36,24 +30,8 @@
 struct rendstate rendstate;
 
 const char* const* rendapi_names[RENDAPI__COUNT] = {
-    #ifdef PSRC_ENGINE_RENDERER_USESR
-    (const char*[]){"sw", "Software rendering"},
-    #endif
-
     #ifdef PSRC_ENGINE_RENDERER_USEGL
-    #ifdef PSRC_ENGINE_RENDERER_GL_USEGL11
-    (const char*[]){"gl11", "OpenGL 1.1"},
-    #endif
-    #ifdef PSRC_ENGINE_RENDERER_GL_USEGL33
-    (const char*[]){"gl33", "OpenGL 3.3"},
-    #endif
-    #ifdef PSRC_ENGINE_RENDERER_GL_USEGLES30
-    (const char*[]){"gles30", "OpenGL ES 3.0"},
-    #endif
-    #endif
-
-    #ifdef PSRC_ENGINE_RENDERER_USEXGU
-    (const char*[]){"xgu", "XGU"}
+    (const char*[]){"gl20", "OpenGL 2.0"},
     #endif
 };
 
@@ -65,27 +43,10 @@ static void* r_dummy_takeScreenshot(int* w, int* h, int* sz) {
 #endif
 
 static enum rendapi trylist[] = {
-    #ifdef PSRC_ENGINE_RENDERER_USEXGU
-    RENDAPI_XGU,
-    #endif
-
     #ifdef PSRC_ENGINE_RENDERER_USEGL
-    #ifdef PSRC_ENGINE_RENDERER_GL_USEGL33
-    RENDAPI_GL33,
+    RENDAPI_GL20,
     #endif
-    #ifdef PSRC_ENGINE_RENDERER_GL_USEGLES30
-    RENDAPI_GLES30,
-    #endif
-    #ifdef PSRC_ENGINE_RENDERER_GL_USEGL11
-    RENDAPI_GL11,
-    #endif
-    #endif
-
-    #ifdef PSRC_ENGINE_RENDERER_USESR
-    RENDAPI_SW,
-    #endif
-
-    RENDAPI__INVALID,
+    RENDAPI__INVALID
 };
 
 void (*render)(void);
@@ -312,31 +273,8 @@ static bool createWindow(void) {
 
 static bool startRenderer_internal(void) {
     switch (rendstate.api) {
-        #ifdef PSRC_ENGINE_RENDERER_USESR
-        case RENDAPI_SW:
-            return false; // TODO: implement
-            //if (!r_sw_prepRenderer()) return false;
-            //render = r_sw_render;
-            //display = r_sw_display;
-            //takeScreenshot = r_sw_takeScreenshot;
-            //beforeCreateWindow = r_sw_beforeCreateWindow;
-            //afterCreateWindow = r_sw_afterCreateWindow;
-            //beforeDestroyWindow = r_sw_beforeDestroyWindow;
-            //updateFrame = r_sw_updateFrame;
-            //updateVSync = r_sw_updateVSync;
-            break;
-        #endif
-
         #ifdef PSRC_ENGINE_RENDERER_USEGL
-        #ifdef PSRC_ENGINE_RENDERER_GL_USEGL11
-        case RENDAPI_GL11:
-        #endif
-        #ifdef PSRC_ENGINE_RENDERER_GL_USEGL33
-        //case RENDAPI_GL33: // TODO: implement
-        #endif
-        #ifdef PSRC_ENGINE_RENDERER_GL_USEGLES30
-        //case RENDAPI_GLES30: // TODO: implement
-        #endif
+        case RENDAPI_GL20:
             if (!r_gl_prepRenderer()) return false;
             render = r_gl_render;
             display = r_gl_display;
@@ -348,22 +286,6 @@ static bool startRenderer_internal(void) {
             updateVSync = r_gl_updateVSync;
             break;
         #endif
-
-        #ifdef PSRC_ENGINE_RENDERER_USEXGU
-        case RENDAPI_XGU:
-            return false; // TODO: implement
-            //if (!r_xgu_prepRenderer()) return false;
-            //render = r_xgu_render;
-            //display = r_xgu_display;
-            //takeScreenshot = r_dummy_takeScreenshot;
-            //beforeCreateWindow = r_xgu_beforeCreateWindow;
-            //afterCreateWindow = r_xgu_afterCreateWindow;
-            //beforeDestroyWindow = r_xgu_beforeDestroyWindow;
-            //updateFrame = r_xgu_updateFrame;
-            //updateVSync = r_xgu_updateVSync;
-            break;
-        #endif
-
         default:
             return false;
     }

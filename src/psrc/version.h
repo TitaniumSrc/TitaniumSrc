@@ -3,7 +3,7 @@
 
 #include "platform.h"
 
-#define TISRC_BUILD 2025120800
+#define TISRC_BUILD 2025120900
 
 extern char* titlestr;
 extern char verstr[];

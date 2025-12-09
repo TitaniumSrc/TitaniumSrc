@@ -1,0 +1,9 @@
+The following docs are shared with PlatinumSrc:
+- 3d models (p3m)
+- databases (pkd)
+- file archives (paf)
+- map entities
+- map extensions
+- maps (pmf)
+- textures (ptf)
+- tracker music (ptm)

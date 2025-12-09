@@ -65,7 +65,7 @@ static const char* const* const rcextensions[RC__COUNT] = {
     (const char* const[]){"ttf", "otf", NULL},
     (const char* const[]){"pmf", NULL},
     (const char* const[]){"p3m", NULL},
-    (const char* const[]){"bas", NULL},
+    (const char* const[]){"lua", NULL},
     (const char* const[]){"ogg", "mp3", "wav", NULL},
     (const char* const[]){"ptf", "png", "jpg", "tga", "bmp", NULL},
     (const char* const[]){"txt", NULL},
@@ -709,7 +709,7 @@ static inline bool cmpRcOpt(enum rctype type, struct resource* rc, const void* o
             if (((const struct rcopt_model*)opt)->flags != rc->model_opt.flags) return false;
         } return true;
         case RC_SCRIPT: {
-            if (((const struct rcopt_script*)opt)->pb != rc->script_opt.pb) return false;
+            //if (((const struct rcopt_script*)opt)->pb != rc->script_opt.pb) return false;
             //if (!pb_util_compiler_opt_cmp(&((const struct rcopt_script*)opt)->compopt, &rc->script_opt.compopt)) return false;
         } return true;
         case RC_TEXTURE: {
@@ -1063,14 +1063,16 @@ void* getRc(enum rctype type, const char* id, const void* opt, unsigned flags, s
         } break;
         case RC_SCRIPT: {
             const struct rcopt_script* o = opt;
+            #if 0
             struct datastream ds;
             if (!dsFromRcAcc(&acc, strdup(id), true, &ds)) goto fail;
             uint32_t progid;
             enum pb_error e = pb_prog_compile(o->pb, &ds, "resource", o->compopt, &progid, err);
             ds_close(&ds);
             if (e != PB_ERROR_NONE) goto fail;
+            #endif
             rc = newRc(RC_SCRIPT);
-            rc->script.progid = progid;
+            //rc->script.progid = progid;
             rc->script_opt = *o;
         } break;
         #ifndef PSRC_MODULE_SERVER
@@ -1333,7 +1335,7 @@ static void freeRcData(enum rctype type, struct resource* rc) {
             p3m_free(&rc->model.model);
         } break;
         case RC_SCRIPT: {
-            pb_prog_destroy(rc->script_opt.pb, rc->script.progid);
+            //pb_prog_destroy(rc->script_opt.pb, rc->script.progid);
         } break;
         case RC_SOUND: {
             free(rc->sound.data);

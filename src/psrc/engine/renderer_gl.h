@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-extern void (*r_gl_render)(void);
+void r_gl_render(void);
 void r_gl_display(void);
 void* r_gl_takeScreenshot(unsigned* w, unsigned* h, unsigned* ch);
 bool r_gl_beforeCreateWindow(unsigned*);

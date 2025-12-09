@@ -6,7 +6,6 @@
 #include "platform.h"
 
 #include "common/config.h"
-#include "common/pbasic.h"
 #include "common/p3m.h"
 
 #ifndef PSRC_MODULE_SERVER
@@ -112,11 +111,10 @@ struct rcopt_model {
 
 // RC_SCRIPT
 struct rc_script {
-    uint32_t progid;
+    int placeholder;
 };
 struct rcopt_script {
-    struct pbasic* pb;
-    const struct pb_compiler_opt* compopt;
+    int placeholder;
 };
 
 // RC_SOUND

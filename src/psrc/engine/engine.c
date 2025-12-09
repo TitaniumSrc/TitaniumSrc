@@ -285,7 +285,7 @@ int bootstrap(void) {
     {
         struct charbuf e;
         cb_init(&e, 128);
-        mainscript = getRc(RC_SCRIPT, "main", &(struct rcopt_script){.pb = &engine.pb.pb, .compopt = &engine.pb.compopt}, 0, &e);
+        mainscript = getRc(RC_SCRIPT, "main", /*&(struct rcopt_script){.pb = &engine.pb.pb, .compopt = &engine.pb.compopt}*/ NULL, 0, &e);
         if (!mainscript) {
             cb_undo(&e, 1);
             plog(LL_CRIT | LF_MSGBOX, "Could not start main script:\n%s", cb_peek(&e));
@@ -423,7 +423,7 @@ int bootstrap(void) {
         }
     }
 
-    // TODO: cleanup
+    // TODO: clean up
     setInputMode(INPUTMODE_INGAME);
     struct inputkey* k;
     #if PLATFORM != PLAT_EMSCR

@@ -12,35 +12,14 @@
     #endif
     #define GL_KHR_debug 0
 #else
-    #ifndef PSRC_ENGINE_RENDERER_GL_USEGLAD
-        #define GL_GLEXT_PROTOTYPES
-        #if PLATFORM != PLAT_MACOS
-            #include <GL/gl.h>
-            #include <GL/glext.h>
-        #else
-            #include <OpenGL/gl.h>
-            #include <OpenGL/glext.h>
-        #endif
-        #if defined(GLAPIENTRY)
-            #define GLDBGCB GLAPIENTRY
-        #elif defined(APIENTRY)
-            #define GLDBGCB APIENTRY
-        #else
-            #define GLDBGCB
-        #endif
-    #else
-        #include "../../glad/gl.h"
-        #define GLDBGCB GLAD_API_PTR
-    #endif
+    #include "../../glad/gl.h"
+    #define GLDBGCB GLAD_API_PTR
     #ifndef GL_KHR_debug
         #define GL_KHR_debug 0
     #endif
 #endif
 
 #if GL_KHR_debug
-    #ifndef PSRC_ENGINE_RENDERER_GL_USEGLAD
-        #pragma weak glDebugMessageCallback
-    #endif
     static void GLDBGCB r_gl_dbgcb(GLenum src, GLenum type, GLuint id, GLenum sev, GLsizei l, const GLchar *m, const void *u) {
         (void)l; (void)u;
         int ll;
@@ -99,35 +78,14 @@ static struct {
     #endif
     uint8_t fastclear : 1;
     uint8_t updateframe : 1;
-    union {
-        #ifdef PSRC_ENGINE_RENDERER_GL_USEGL11
-        struct {
-            uint_fast8_t oddframe : 1;
-            uint_fast8_t has_ARB_multitexture : 1;
-            uint_fast8_t has_ARB_texture_border_clamp : 1;
-            int maxlights;
-            int maxtexunits;
-        } gl11;
-        #endif
-        #ifdef PSRC_ENGINE_RENDERER_GL_USEGL33
-        struct {
-            char placeholder;
-        } gl33;
-        #endif
-        #ifdef PSRC_ENGINE_RENDERER_GL_USEGLES30
-        struct {
-            char placeholder;
-        } gles30;
-        #endif
-    };
+    uint_fast8_t oddframe : 1;
+    int maxtexunits;
     struct {
         struct r_gl_playerdata* data;
         unsigned len;
         unsigned size;
     } playerdata;
 } r_gl_data;
-
-void (*r_gl_render)(void);
 
 void r_gl_display(void) {
     #ifndef PSRC_USESDL1
@@ -271,8 +229,7 @@ void r_gl_updateVSync(void) {
     #endif
 }
 
-#ifdef PSRC_ENGINE_RENDERER_GL_USEGL11
-static void r_gl_rendermodel_legacy(struct p3m* m, struct p3m_vertex** transverts) {
+static void r_gl_rendermodel(struct p3m* m, struct p3m_vertex** transverts) {
     long lt = SDL_GetTicks();
     #if 0
     int vertct = 0;
@@ -320,7 +277,7 @@ static void r_gl_rendermodel_legacy(struct p3m* m, struct p3m_vertex** transvert
     #endif
 }
 #if 0
-static void r_gl_render_legacy(void) {
+void r_gl_render(void) {
     r_gl_updatePlayerData();
 
     r_gl_clearScreen();
@@ -365,7 +322,7 @@ static void r_gl_render_legacy(void) {
     glFinish();
 }
 #else
-static void r_gl_render_legacy(void) {
+void r_gl_render(void) {
     r_gl_updatePlayerData();
 
     long lt = SDL_GetTicks();
@@ -378,13 +335,13 @@ static void r_gl_render_legacy(void) {
     float tsini = 1.0f - tsinn;
     float tcosi = 1.0f - tcosn;
 
-    r_gl_data.gl11.oddframe = !r_gl_data.gl11.oddframe;
+    r_gl_data.oddframe = !r_gl_data.oddframe;
 
     if (!r_gl_data.fastclear) {
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         glDepthFunc(GL_LEQUAL);
         glDepthRange(0.1, 1.0);
-    } else if (r_gl_data.gl11.oddframe) {
+    } else if (r_gl_data.oddframe) {
         glDepthFunc(GL_LEQUAL);
         glDepthRange(0.1, 0.5);
     } else {
@@ -458,7 +415,7 @@ static void r_gl_render_legacy(void) {
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
 
-        if (testmodel) r_gl_rendermodel_legacy(&testmodel->model, NULL);
+        if (testmodel) r_gl_rendermodel(&testmodel->model, NULL);
 
         glDepthMask(GL_FALSE);
         glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
@@ -478,7 +435,7 @@ static void r_gl_render_legacy(void) {
         glEnd();
 
         if (!r_gl_data.fastclear) glDepthRange(1.0, 1.0);
-        else if (r_gl_data.gl11.oddframe) glDepthRange(0.5, 0.5);
+        else if (r_gl_data.oddframe) glDepthRange(0.5, 0.5);
         else glDepthRange(0.5, 0.5);
 
         rpldata->viewmat[3][0] = 0.0f;
@@ -582,7 +539,7 @@ static void r_gl_render_legacy(void) {
         glEnd();
 
         if (!r_gl_data.fastclear) glDepthRange(0.0, 0.1);
-        else if (r_gl_data.gl11.oddframe) glDepthRange(0.0, 0.1);
+        else if (r_gl_data.oddframe) glDepthRange(0.0, 0.1);
         else glDepthRange(1.0, 0.9);
 
         glMatrixMode(GL_PROJECTION);
@@ -638,46 +595,6 @@ static void r_gl_render_legacy(void) {
     glFinish();
 }
 #endif
-#endif
-
-#if defined(PSRC_ENGINE_RENDERER_GL_USEGL33) || defined(PSRC_ENGINE_RENDERER_GL_USEGLES30)
-static void r_gl_render_advanced(void) {
-    r_gl_updatePlayerData();
-
-    if (r_gl_data.fastclear) {
-        glClear(GL_DEPTH_BUFFER_BIT);
-    } else {
-        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-    }
-
-    if (rendstate.lighting >= 1) {
-        // TODO: render opaque materials front to back with light mapping
-    } else {
-        // TODO: render opaque materials front to back with basic lighting
-    }
-
-    glEnable(GL_CULL_FACE);
-
-    // TODO: render entities
-
-    glDisable(GL_CULL_FACE);
-    glEnable(GL_BLEND);
-    glDepthMask(GL_FALSE);
-
-    if (rendstate.lighting >= 2) {
-        // TODO: render transparent materials back to front with light mapping
-    } else {
-        // TODO: render transparent materials back to front with basic lighting
-    }
-
-    glDisable(GL_BLEND);
-    glDepthMask(GL_TRUE);
-
-    // TODO: render UI
-
-    glFinish();
-}
-#endif
 
 void* r_gl_takeScreenshot(unsigned* w, unsigned* h, unsigned* c) {
     size_t linesz = rendstate.res.current.width * 3;
@@ -711,27 +628,11 @@ void* r_gl_takeScreenshot(unsigned* w, unsigned* h, unsigned* c) {
 bool r_gl_beforeCreateWindow(unsigned* f) {
     switch (rendstate.api) {
         #if PLATFORM != PLAT_EMSCR && !defined(PSRC_USESDL1)
-            #ifdef PSRC_ENGINE_RENDERER_GL_USEGL11
-            case RENDAPI_GL11:
+            case RENDAPI_GL20:
                 SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
-                SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);
-                SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-                break;
-            #endif
-            #ifdef PSRC_ENGINE_RENDERER_GL_USEGL33
-            case RENDAPI_GL33:
-                SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
-                SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-                SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-                break;
-            #endif
-            #ifdef PSRC_ENGINE_RENDERER_GL_USEGLES30
-            case RENDAPI_GLES30:
-                SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-                SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+                SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
                 SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
                 break;
-            #endif
         #endif
         default:
             break;
@@ -773,7 +674,7 @@ bool r_gl_afterCreateWindow(void) {
         }
         SDL_GL_MakeCurrent(rendstate.window, r_gl_data.ctx);
     #endif
-    #if PLATFORM != PLAT_EMSCR && defined(PSRC_ENGINE_RENDERER_GL_USEGLAD)
+    #if PLATFORM != PLAT_EMSCR
         if (!gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress)) {
             plog(LL_CRIT | LF_FUNC, "Failed to load OpenGL");
             return false;
@@ -838,45 +739,16 @@ bool r_gl_afterCreateWindow(void) {
             plog(LL_INFO, "    %s", tmplist[i]);
             ++passed;
         }
-        #ifdef PSRC_ENGINE_RENDERER_GL_USEGL11
-        if (rendstate.api == RENDAPI_GL11) {
-            for (size_t i = 0, foundext = 0; i < ct; ++i) {
-                if (!*tmplist[i]) continue;
-                if (!strcasecmp(tmplist[i], "GL_ARB_multitexture")) {
-                    r_gl_data.gl11.has_ARB_multitexture = 1;
-                    ++foundext;
-                } else if (!strcasecmp(tmplist[i], "GL_ARB_texture_border_clamp")) {
-                    r_gl_data.gl11.has_ARB_texture_border_clamp = 1;
-                    ++foundext;
-                }
-                if (foundext == 2) break;
-            }
-        }
-        #endif
         free(*tmplist);
         free(tmplist);
     }
-    #ifdef PSRC_ENGINE_RENDERER_GL_USEGL11
-    if (rendstate.api == RENDAPI_GL11) {
-        plog(LL_INFO, "  GL_ARB_multitexture is %ssupported", (r_gl_data.gl11.has_ARB_multitexture) ? "" : "not ");
-        plog(LL_INFO, "  GL_ARB_texture_border_clamp is %ssupported", (r_gl_data.gl11.has_ARB_texture_border_clamp) ? "" : "not ");
-    }
-    #endif
     #if GL_KHR_debug
         plog(LL_INFO, "  GL_KHR_debug is %ssupported", (glDebugMessageCallback) ? "" : "not ");
     #else
         plog(LL_INFO, "  GL_KHR_debug is not supported");
     #endif
-    #ifdef PSRC_ENGINE_RENDERER_GL_USEGL11
-    if (rendstate.api == RENDAPI_GL11) {
-        glGetIntegerv(GL_MAX_LIGHTS, &r_gl_data.gl11.maxlights);
-        plog(LL_INFO, "  Max lights: %d", r_gl_data.gl11.maxlights);
-        if (r_gl_data.gl11.has_ARB_multitexture) {
-            glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &r_gl_data.gl11.maxtexunits);
-            plog(LL_INFO, "  Max texture units: %d", r_gl_data.gl11.maxtexunits);
-        }
-    }
-    #endif
+    glGetIntegerv(GL_MAX_TEXTURE_UNITS, &r_gl_data.maxtexunits);
+    plog(LL_INFO, "  Max texture units: %d", r_gl_data.maxtexunits);
     cond[0] = !SDL_GL_GetAttribute(SDL_GL_ACCELERATED_VISUAL, &tmpint[0]);
     if (cond[0]) plog(LL_INFO, "  Hardware acceleration is %s", (tmpint[0]) ? "enabled" : "disabled");
     cond[0] = !SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &tmpint[0]);
@@ -915,27 +787,8 @@ bool r_gl_afterCreateWindow(void) {
 }
 
 bool r_gl_prepRenderer(void) {
-    switch (rendstate.api) {
-        #ifdef PSRC_ENGINE_RENDERER_GL_USEGL11
-        case RENDAPI_GL11:
-            r_gl_render = r_gl_render_legacy;
-            break;
-        #endif
-        #if defined(PSRC_ENGINE_RENDERER_GL_USEGL33) || defined(PSRC_ENGINE_RENDERER_GL_USEGLES30)
-        #ifdef PSRC_ENGINE_RENDERER_GL_USEGL33
-        case RENDAPI_GL33:
-        #endif
-        #ifdef PSRC_ENGINE_RENDERER_GL_USEGLES30
-        case RENDAPI_GLES30:
-        #endif
-            r_gl_render = r_gl_render_advanced;
-            break;
-        #endif
-        default:
-            break;
-    }
     VLB_INIT(r_gl_data.playerdata, 1, VLB_OOM_NOP);
-    testmodel = getRc(RC_MODEL, "game:test/test_model", NULL, 0, NULL);
+    testmodel = getRc(RC_MODEL, "models/test", NULL, 0, NULL);
     #if GL_KHR_debug
         if (glDebugMessageCallback) glDebugMessageCallback(r_gl_dbgcb, NULL);
     #endif

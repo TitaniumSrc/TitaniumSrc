@@ -9,7 +9,7 @@ else {
 
 android {
     if (buildAsApplication) {
-        namespace "org.psrc.psrc"
+        namespace "org.tisrc.tisrc"
     }
     compileSdkVersion 34
     defaultConfig {
@@ -27,7 +27,7 @@ android {
                 arguments "-DANDROID_APP_PLATFORM=android-19"
                 abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
                 // abiFilters 'arm64-v8a'
-                targets 'psrc'
+                targets 'tisrc'
             }
         }
     }
@@ -63,7 +63,7 @@ android {
             variant.outputs.each { output ->
                 def outputFile = output.outputFile
                 if (outputFile != null && outputFile.name.endsWith(".aar")) {
-                    def fileName = "org.psrc.psrc.aar";
+                    def fileName = "org.tisrc.tisrc.aar";
                     output.outputFile = new File(outputFile.parent, fileName);
                 }
             }
