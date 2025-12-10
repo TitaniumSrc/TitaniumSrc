@@ -1,0 +1,19 @@
+#ifndef TISRC_TIME_H
+#define TISRC_TIME_H
+
+#include "platform.h"
+
+#include <stdint.h>
+#if (PLATFLAGS & PLATFLAG_WINDOWSLIKE)
+    #include <windows.h>
+#endif
+
+void microwait(uint64_t);
+uint64_t altutime(void);
+
+#if (PLATFLAGS & PLATFLAG_WINDOWSLIKE)
+extern LARGE_INTEGER perfctfreq;
+extern uint64_t perfctmul;
+#endif
+
+#endif

@@ -1,0 +1,10 @@
+#ifndef TISRC_ENGINE_PTF_H
+#define TISRC_ENGINE_PTF_H
+
+#define PTF_REV 0
+
+#include "../datastream.h"
+
+void* ptf_load(TISRC_DATASTREAM_T, unsigned* w, unsigned* h, unsigned* ch);
+
+#endif

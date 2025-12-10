@@ -5,7 +5,7 @@
 source util.sh
 
 tsk 'Getting info...'
-VER="$(grep '#define TISRC_BUILD ' src/psrc/version.h | sed 's/#define .* //')"
+VER="$(grep '#define TISRC_BUILD ' src/tisrc/version.h | sed 's/#define .* //')"
 printf "${I} ${TB}Version:${TR} [%s]\n" "${VER}"
 getchanges() {
     sed -n '/^### Done$/,$p' TODO.md | tail -n +2

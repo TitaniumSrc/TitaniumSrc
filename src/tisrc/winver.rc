@@ -1,0 +1,35 @@
+#include "version.h"
+#define _STR(x) #x
+#define STR(x) _STR(x)
+
+#if defined(TISRC_MODULE_ENGINE)
+    #define TISRC_MD "TitaniumSrc engine"
+    #define TISRC_ICON "internal/engine/icon.ico"
+#elif defined(TISRC_MODULE_SERVER)
+    #define TISRC_MD "TitaniumSrc server"
+    #define TISRC_ICON "internal/server/icon.ico"
+#elif defined(TISRC_MODULE_EDITOR)
+    #define TISRC_MD "TitaniumSrc editor"
+    #define TISRC_ICON "internal/editor/icon.ico"
+#endif
+#ifdef TISRC_DBGLVL
+    #define TISRC_MODULEDESC TISRC_MD " (debug build)"
+#else
+    #define TISRC_MODULEDESC TISRC_MD
+#endif
+
+MAINICON ICON TISRC_ICON
+1 VERSIONINFO
+{
+    BLOCK "StringFileInfo" {
+        BLOCK "040904E4" {
+            VALUE "ProductName", "TitaniumSrc"
+            VALUE "ProductVersion", STR(TISRC_BUILD)
+            VALUE "FileDescription", TISRC_MODULEDESC
+            VALUE "LegalCopyright", "Licensed under the BSL 1.0"
+        }
+    }
+    BLOCK "VarFileInfo" {
+        VALUE "Translation", 0x0409, 0x04E4
+    }
+}

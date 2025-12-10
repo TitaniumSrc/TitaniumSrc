@@ -2,7 +2,7 @@
 
 {
 
-VERSION_H="src/psrc/version.h"
+VERSION_H="src/tisrc/version.h"
 DATE="$(date -u +'%Y%m%d')"
 
 VERLINE="$(grep -E '\s*#define\s+TISRC_BUILD\s+' "${VERSION_H}")"

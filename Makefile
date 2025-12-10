@@ -137,7 +137,7 @@ endif
 
 _CFLAGS := $(CFLAGS) -I$(EXTDIR)/$(PLATFORM)/include -I$(EXTDIR)/include -fno-exceptions -Wall -Wextra -Wuninitialized -Wundef -fvisibility=hidden
 _CXXFLAGS := $(CXXFLAGS) -fno-rtti -fno-exceptions
-_CPPFLAGS := $(CPPFLAGS) -DPSRC_MTLVL=$(MTLVL) -D_DEFAULT_SOURCE -D_GNU_SOURCE
+_CPPFLAGS := $(CPPFLAGS) -DTISRC_MTLVL=$(MTLVL) -D_DEFAULT_SOURCE -D_GNU_SOURCE
 _LDFLAGS := $(LDFLAGS) -L$(EXTDIR)/$(PLATFORM)/lib -L$(EXTDIR)/lib
 _LDLIBS := $(LDLIBS) -lm
 _WRFLAGS := $(WRFLAGS)
@@ -162,7 +162,7 @@ else ifeq ($(CROSS),android)
 else ifeq ($(CROSS),emscr)
     _LDFLAGS += -sALLOW_MEMORY_GROWTH -sEXIT_RUNTIME -sEXPORTED_RUNTIME_METHODS=ccall -sWASM_BIGINT
     ifndef EMSCR_SHELL
-        _LDFLAGS += --shell-file $(SRCDIR)/psrc/emscr_shell.html
+        _LDFLAGS += --shell-file $(SRCDIR)/tisrc/emscr_shell.html
     else
         _LDFLAGS += --shell-file $(EMSCR_SHELL)
     endif
@@ -181,7 +181,7 @@ ifneq ($(MT),0)
         else ifeq ($(USEWINPTHREAD),y)
             _CFLAGS += -pthread
             _LDFLAGS += -pthread
-            _CPPFLAGS += -DPSRC_THREADING_USEWINPTHREAD
+            _CPPFLAGS += -DTISRC_THREADING_USEWINPTHREAD
             _LDLIBS += -l:libwinpthread.a
         endif
     endif
@@ -203,31 +203,31 @@ ifneq ($(CROSS),emscr)
     endif
 endif
 ifneq ($(DEFAULTGAME),)
-    _CPPFLAGS += -DPSRC_DEFAULTGAME='$(subst ','\'',$(DEFAULTGAME))'
+    _CPPFLAGS += -DTISRC_DEFAULTGAME='$(subst ','\'',$(DEFAULTGAME))'
 endif
 ifeq ($(NOSIMD),y)
-    _CPPFLAGS += -DPSRC_NOSIMD
+    _CPPFLAGS += -DTISRC_NOSIMD
 endif
 ifeq ($(USESTDIODS),y)
-    _CPPFLAGS += -DPSRC_DATASTREAM_USESTDIO
+    _CPPFLAGS += -DTISRC_DATASTREAM_USESTDIO
 endif
 ifeq ($(USESDLDS),y)
-    _CPPFLAGS += -DPSRC_DATASTREAM_USESDL
+    _CPPFLAGS += -DTISRC_DATASTREAM_USESDL
 endif
 ifeq ($(USEMINIMP3),y)
-    _CPPFLAGS += -DPSRC_USEMINIMP3
+    _CPPFLAGS += -DTISRC_USEMINIMP3
 endif
 ifeq ($(USESTBVORBIS),y)
-    _CPPFLAGS += -DPSRC_USESTBVORBIS
+    _CPPFLAGS += -DTISRC_USESTBVORBIS
 endif
 ifeq ($(USEPLMPEG),y)
-    _CPPFLAGS += -DPSRC_USEPLMPEG
+    _CPPFLAGS += -DTISRC_USEPLMPEG
 endif
 ifeq ($(USESR),y)
-    _CPPFLAGS += -DPSRC_ENGINE_RENDERER_USESR
+    _CPPFLAGS += -DTISRC_ENGINE_RENDERER_USESR
 endif
 ifeq ($(USEGL),y)
-    _CPPFLAGS += -DPSRC_ENGINE_RENDERER_USEGL
+    _CPPFLAGS += -DTISRC_ENGINE_RENDERER_USEGL
 endif
 ifndef DEBUG
     _CPPFLAGS += -DNDEBUG=1
@@ -251,14 +251,14 @@ ifndef DEBUG
         _LDFLAGS += -flto
     endif
 else
-    _CPPFLAGS += -DPSRC_DBGLVL=$(DEBUG)
+    _CPPFLAGS += -DTISRC_DBGLVL=$(DEBUG)
     ifndef O
         O := g
     endif
     _CFLAGS += -O$(O) -g -Wdouble-promotion -fno-omit-frame-pointer
     #_CFLAGS += -Wconversion
     ifeq ($(CROSS),win32)
-        _WRFLAGS += -DPSRC_DBGLVL=$(DEBUG)
+        _WRFLAGS += -DTISRC_DBGLVL=$(DEBUG)
     endif
     NOSTRIP := y
     ifeq ($(ASAN),y)
@@ -269,18 +269,18 @@ endif
 
 CPPFLAGS.dir.lz4 := -DXXH_NAMESPACE=LZ4_ -DLZ4_STATIC_LINKING_ONLY_ENDIANNESS_INDEPENDENT_OUTPUT
 
-CPPFLAGS.dir.psrc := 
+CPPFLAGS.dir.tisrc := 
 ifeq ($(USESTDTHREAD),y)
-    CPPFLAGS.dir.psrc += -DPSRC_THREADING_USESTDTHREAD
+    CPPFLAGS.dir.tisrc += -DTISRC_THREADING_USESTDTHREAD
 endif
-LDLIBS.dir.psrc := 
+LDLIBS.dir.tisrc := 
 ifeq ($(CROSS),win32)
-    LDLIBS.dir.psrc += -lwinmm
+    LDLIBS.dir.tisrc += -lwinmm
 endif
 
-LDLIBS.dir.psrc_server := 
+LDLIBS.dir.tisrc_server := 
 ifeq ($(CROSS),win32)
-    LDLIBS.dir.psrc_server += -lws2_32
+    LDLIBS.dir.tisrc_server += -lws2_32
 endif
 
 ifeq ($(USEMINIMP3),y)
@@ -309,7 +309,7 @@ ifeq ($(MT),0)
 endif
 
 ifeq ($(USEDISCORDGAMESDK),y)
-    CPPFLAGS.lib.discord_game_sdk := -DPSRC_USEDISCORDGAMESDK
+    CPPFLAGS.lib.discord_game_sdk := -DTISRC_USEDISCORDGAMESDK
     LDLIBS.lib.discord_game_sdk := -l:discord_game_sdk$(SOSUF)
 endif
 
@@ -331,7 +331,7 @@ ifneq ($(USESDL1),y)
         endif
     endif
 else
-    CPPFLAGS.lib.SDL += -DPSRC_USESDL1
+    CPPFLAGS.lib.SDL += -DTISRC_USESDL1
     ifeq ($(CROSS),emscr)
         CFLAGS.lib.SDL += -sUSE_SDL
         LDLIBS.lib.SDL += -sUSE_SDL
@@ -348,26 +348,26 @@ else
 endif
 
 ifeq ($(MODULE),engine)
-    _CPPFLAGS += -DPSRC_MODULE_ENGINE
-    _WRFLAGS += -DPSRC_MODULE_ENGINE
+    _CPPFLAGS += -DTISRC_MODULE_ENGINE
+    _WRFLAGS += -DTISRC_MODULE_ENGINE
     _CFLAGS += $(CFLAGS.lib.SDL)
-    _CPPFLAGS += $(CPPFLAGS.dir.lz4) $(CPPFLAGS.dir.stb) $(CPPFLAGS.dir.minimp3) $(CPPFLAGS.dir.stbvorbis) $(CPPFLAGS.dir.schrift) $(CPPFLAGS.dir.psrc)
+    _CPPFLAGS += $(CPPFLAGS.dir.lz4) $(CPPFLAGS.dir.stb) $(CPPFLAGS.dir.minimp3) $(CPPFLAGS.dir.stbvorbis) $(CPPFLAGS.dir.schrift) $(CPPFLAGS.dir.tisrc)
     _CPPFLAGS += $(CPPFLAGS.lib.SDL) $(CPPFLAGS.lib.discord_game_sdk)
-    _LDLIBS += $(LDLIBS.dir.psrc_engine) $(LDLIBS.dir.psrc)
+    _LDLIBS += $(LDLIBS.dir.tisrc_engine) $(LDLIBS.dir.tisrc)
     _LDLIBS += $(LDLIBS.lib.discord_game_sdk) $(LDLIBS.lib.SDL)
 else ifeq ($(MODULE),server)
-    _CPPFLAGS += -DPSRC_MODULE_SERVER
-    _WRFLAGS += -DPSRC_MODULE_SERVER
+    _CPPFLAGS += -DTISRC_MODULE_SERVER
+    _WRFLAGS += -DTISRC_MODULE_SERVER
     _CPPFLAGS += $(CPPFLAGS.dir.lz4)
     _CPPFLAGS += $(CPPFLAGS.lib.discord_game_sdk)
-    _LDLIBS += $(LDLIBS.dir.psrc) $(LDLIBS.lib.discord_game_sdk)
+    _LDLIBS += $(LDLIBS.dir.tisrc) $(LDLIBS.lib.discord_game_sdk)
 else ifeq ($(MODULE),editor)
-    _CPPFLAGS += -DPSRC_MODULE_EDITOR
-    _WRFLAGS += -DPSRC_MODULE_EDITOR
+    _CPPFLAGS += -DTISRC_MODULE_EDITOR
+    _WRFLAGS += -DTISRC_MODULE_EDITOR
     _CFLAGS += $(CFLAGS.lib.SDL)
-    _CPPFLAGS += $(CPPFLAGS.dir.lz4) $(CPPFLAGS.dir.stb) $(CPPFLAGS.dir.minimp3) $(CPPFLAGS.dir.stbvorbis) $(CPPFLAGS.dir.schrift) $(CPPFLAGS.dir.psrc)
+    _CPPFLAGS += $(CPPFLAGS.dir.lz4) $(CPPFLAGS.dir.stb) $(CPPFLAGS.dir.minimp3) $(CPPFLAGS.dir.stbvorbis) $(CPPFLAGS.dir.schrift) $(CPPFLAGS.dir.tisrc)
     _CPPFLAGS += $(CPPFLAGS.lib.SDL) $(CPPFLAGS.lib.discord_game_sdk)
-    _LDLIBS += $(LDLIBS.dir.psrc_engine) $(LDLIBS.dir.psrc)
+    _LDLIBS += $(LDLIBS.dir.tisrc_engine) $(LDLIBS.dir.tisrc)
     _LDLIBS += $(LDLIBS.lib.discord_game_sdk) $(LDLIBS.lib.SDL)
 endif
 
@@ -406,8 +406,8 @@ BINPATH := $(OUTDIR)/$(BINPATH)
 
 ifeq ($(CROSS),win32)
     ifneq ($(_WINDRES),)
-        WRSRC := $(SRCDIR)/psrc/winver.rc
-        WROBJ := $(_OBJDIR)/psrc/winver.o
+        WRSRC := $(SRCDIR)/tisrc/winver.rc
+        WROBJ := $(_OBJDIR)/tisrc/winver.o
         _WROBJ = $$(test -f $(WROBJ) && echo $(WROBJ))
     endif
 endif
@@ -455,15 +455,15 @@ $(TR_FILE):
 	@date +%s%N > $(_TR_STFILE)
 endif
 
-SRCDIRS := $(SRCDIR)/psrc
+SRCDIRS := $(SRCDIR)/tisrc
 ifeq ($(MODULE),engine)
-    SRCDIRS := $(SRCDIRS) $(SRCDIR)/psrc/engine $(SRCDIR)/psrc/server
+    SRCDIRS := $(SRCDIRS) $(SRCDIR)/tisrc/engine $(SRCDIR)/tisrc/server
 else ifeq ($(MODULE),server)
-    SRCDIRS := $(SRCDIRS) $(SRCDIR)/psrc/server
+    SRCDIRS := $(SRCDIRS) $(SRCDIR)/tisrc/server
 else ifeq ($(MODULE),editor)
-    SRCDIRS := $(SRCDIRS) $(SRCDIR)/psrc/engine $(SRCDIR)/psrc/server $(SRCDIR)/psrc/editor
+    SRCDIRS := $(SRCDIRS) $(SRCDIR)/tisrc/engine $(SRCDIR)/tisrc/server $(SRCDIR)/tisrc/editor
 endif
-SRCDIRS := $(SRCDIRS) $(SRCDIR)/psrc/common $(SRCDIR)/psrc $(SRCDIR)/lz4
+SRCDIRS := $(SRCDIRS) $(SRCDIR)/tisrc/common $(SRCDIR)/tisrc $(SRCDIR)/lz4
 ifneq ($(MODULE),server)
     SRCDIRS := $(SRCDIRS) $(SRCDIR)/stb $(SRCDIR)/schrift
     ifeq ($(USEMINIMP3),y)
@@ -499,7 +499,7 @@ $(_OBJDIR)/%.c.o: $(SRCDIR)/%.c $(call cdeps,$(SRCDIR)/%.c) | $(_OBJDIR) $(TR_FI
 
 $(_OBJDIR)/%.cpp.o: $(SRCDIR)/%.cpp $(call cxxdeps,$(SRCDIR)/%.cpp) | $(_OBJDIR) $(TR_FILE)
 	@echo Compiling $(patsubst $(SRCDIR)/%,%,$<)...
-	@$(_TR_BEFORE) $(_CXX) $(_CFLAGS) $(_CPPFLAGS) $< -c -o $@ $(_TR_AFTER)
+	@$(_TR_BEFORE) $(_CXX) $(_CXXFLAGS) $(_CPPFLAGS) $< -c -o $@ $(_TR_AFTER)
 	@echo Compiled $(patsubst $(SRCDIR)/%,%,$<)
 
 $(BINPATH): $(COBJECTS) $(CXXOBJECTS) | $(OUTDIR)

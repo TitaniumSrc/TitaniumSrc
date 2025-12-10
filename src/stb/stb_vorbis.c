@@ -1,4 +1,4 @@
-#ifdef PSRC_USESTBVORBIS
+#ifdef TISRC_USESTBVORBIS
 
 // Ogg Vorbis audio decoder - v1.22 - public domain
 // http://nothings.org/stb_vorbis/
@@ -421,7 +421,7 @@ enum STBVorbisError
 
 #ifndef STB_VORBIS_HEADER_ONLY
 
-#include "../psrc/rcmgralloc.h"
+#include "../tisrc/rcmgralloc.h"
 
 // global configuration settings (e.g. set these in the project/makefile),
 // or just set them in this file at the top (although ideally the first few

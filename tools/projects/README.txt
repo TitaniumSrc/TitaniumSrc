@@ -1,5 +1,5 @@
 'android':
 
-    Example/template project files for building PlatinumSrc for Android.
+    Example/template project files for building TitaniumSrc for Android.
 
 
