@@ -11,11 +11,12 @@
 
 PACKEDENUM loglevel {
     LL_PLAIN,            // Print without a prefix
-    LL_INFO,             // Give info or warning
     LL_MS,               // A milestone was achieved
+    LL_INFO,             // Give info or warning
     LL_WARN,             // Something happened that could cause issues
     LL_ERROR,            // A recoverable error occurred
     LL_CRIT,             // An irrecoverable error occurred
+    LL__COUNT,
     LF_FUNC = 1 << 8,    // Display the function plog() was called from
     LF_FUNCLN = 3 << 8,  // Display the function and line plog() was called on
     LF_MSGBOX = 1 << 10, // Display a message box on platforms that support it

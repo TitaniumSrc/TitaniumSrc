@@ -71,6 +71,7 @@ bool ds_opensect(struct datastream*, size_t lim, const char* name, bool freename
 
 size_t ds_read(struct datastream*, size_t len, void* outbuf);
 size_t ds_skip(struct datastream*, size_t len);
+void* ds_readchunk(struct datastream*, size_t* lout);
 static ALWAYSINLINE int ds_getc(struct datastream*);
 bool ds_seek(struct datastream*, size_t off);
 static ALWAYSINLINE size_t ds_tell(struct datastream*);

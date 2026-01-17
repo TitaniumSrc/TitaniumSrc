@@ -374,7 +374,7 @@ endif
 _CXXFLAGS += $(_CFLAGS)
 ifdef DEBUG
     ifneq ($(CROSS),emscr)
-        _CFLAGS += -std=c11 -pedantic
+        _CFLAGS += -std=c11 #-pedantic
     endif
 endif
 
