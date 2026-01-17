@@ -465,7 +465,7 @@ else ifeq ($(MODULE),editor)
 endif
 SRCDIRS := $(SRCDIRS) $(SRCDIR)/tisrc/common $(SRCDIR)/tisrc $(SRCDIR)/lz4
 ifneq ($(MODULE),server)
-    SRCDIRS := $(SRCDIRS) $(SRCDIR)/stb $(SRCDIR)/schrift
+    SRCDIRS := $(SRCDIRS) $(SRCDIR)/stb $(SRCDIR)/schrift $(SRCDIR)/lua
     ifeq ($(USEMINIMP3),y)
         SRCDIRS := $(SRCDIRS) $(SRCDIR)/minimp3
     endif

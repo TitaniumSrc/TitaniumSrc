@@ -18,6 +18,8 @@
 #include "../time.h"
 #include "../util.h"
 #include "../arg.h"
+#include "../../lua/tilua.h"
+
 #if DEBUG(1)
     #include "../profiling.h"
 #endif
@@ -93,7 +95,7 @@ static inline void printprofpoint(uint8_t r, uint8_t g, uint8_t b, unsigned t, u
 
 int bootstrap(void) {
     plog(LL_MS, "Starting engine...");
-
+    //luaRun("./test.lua");
     setupBaseDirs();
 
     char* tmp = (engine.opt.config) ? strpath(engine.opt.config) : mkpath(dirs[DIR_INTERNAL], "engine", "config.cfg", NULL);

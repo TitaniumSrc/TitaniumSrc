@@ -371,8 +371,7 @@ static void plog_internal(enum loglevel lvl, const char* func, const char* file,
     logring_step();
 }
 
-#undef plog
-void plog(enum loglevel lvl, const char* func, const char* file, unsigned line, const char* s, ...) {
+void plog_raw(enum loglevel lvl, const char* func, const char* file, unsigned line, const char* s, ...) {
     #if TISRC_MTLVL >= 2
     lockMutex(&loglock);
     #endif
