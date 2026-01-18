@@ -16,8 +16,8 @@
     #endif
 #endif
 
-void ds_openmem(void* b, size_t sz, const char* n, bool fn, ds_mem_freecb freecb, void* freectx, struct datastream* ds) {
-    ds->buf = b;
+void ds_openmem(const void* b, size_t sz, const char* n, bool fn, ds_mem_freecb freecb, void* freectx, struct datastream* ds) {
+    ds->buf = (uint8_t*)b;
     ds->pos = 0;
     ds->passed = 0;
     ds->datasz = sz;

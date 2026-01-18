@@ -98,15 +98,18 @@ int bootstrap(void) {
     setupBaseDirs();
 
     {
+        static const char testprog[] =
+            "tisrc.log(tisrc.log.ms, 'Started ' .. _VERSION .. ' on TitaniumSrc ' .. tisrc.info.build)\n"
+        ;
         struct datastream ds;
-        if (ds_openfile("test.lua", "test.lua", false, 0, &ds)) {
-            lua_State* L = newLuaState();
-            if (!L) return 1;
-            bool ret = runLuaStream(L, &ds, 0, 0);
-            ds_close(&ds);
-            delLuaState(L);
-            if (!ret) return 1;
-        }
+        //if (ds_openfile("test.lua", "test.lua", false, 0, &ds)) {}
+        lua_State* L = newLuaState();
+        if (!L) return 1;
+        ds_openmem(testprog, sizeof(testprog) - 1, NULL, false, NULL, NULL, &ds);
+        bool ret = runLuaStream(L, &ds, 0, 0);
+        ds_close(&ds);
+        delLuaState(L);
+        if (!ret) return 1;
     }
 
     char* tmp = (engine.opt.config) ? strpath(engine.opt.config) : mkpath(dirs[DIR_INTERNAL], "engine", "config.cfg", NULL);

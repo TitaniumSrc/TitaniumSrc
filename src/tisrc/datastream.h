@@ -64,7 +64,7 @@ struct datastream {
     enum ds_type type : 6;
 };
 
-void ds_openmem(void* buf, size_t sz, const char* name, bool freename, ds_mem_freecb freecb, void* freectx, struct datastream*);
+void ds_openmem(const void* buf, size_t sz, const char* name, bool freename, ds_mem_freecb freecb, void* freectx, struct datastream*);
 bool ds_openfile(const char* path, const char* name, bool freename, size_t bufsz, struct datastream*);
 bool ds_opencb(struct ds_cb_funcs*, const char* name, bool freename, size_t bufsz, struct datastream*);
 bool ds_opensect(struct datastream*, size_t lim, const char* name, bool freename, size_t bufsz, struct datastream*);

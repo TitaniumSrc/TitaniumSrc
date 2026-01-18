@@ -21,9 +21,8 @@
 #define ARCH_I386    4
 #define ARCH_MIPS    5
 #define ARCH_PPC     6
-#define ARCH_SUPERH  7
-#define ARCH_WASM    8
-#define ARCH__COUNT  9
+#define ARCH_WASM    7
+#define ARCH__COUNT  8
 
 #define BO_LE 1234
 #define BO_BE 4321
@@ -111,9 +110,6 @@
 #elif defined(__powerpc) || defined(__powerpc__) || defined(__POWERPC__) || defined(__ppc__) || defined(__PPC__)
     #define ARCH ARCH_PPC
     #define ARCHSTR "PowerPC"
-#elif defined(__sh__) || defined(__SH__)
-    #define ARCH ARCH_SUPERH
-    #define ARCHSTR "SuperH"
 #elif defined(__wasm) || defined(__wasm__) || defined(__WASM__)
     #define ARCH ARCH_WASM
     #define ARCHSTR "WebAssembly"

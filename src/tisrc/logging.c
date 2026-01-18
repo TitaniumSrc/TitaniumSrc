@@ -11,7 +11,6 @@
 #if !(PLATFLAGS & PLATFLAG_WINDOWSLIKE)
     #include <unistd.h>
 #endif
-#include <stdarg.h>
 #include <stdbool.h>
 
 #if defined(TISRC_MODULE_ENGINE) || defined(TISRC_MODULE_EDITOR)
@@ -262,10 +261,14 @@ static void plog_internal(enum loglevel lvl, const char* func, const char* file,
         if ((lvl & 0xFF) >= LL_WARN) lvl |= LF_FUNCLN;
     #endif
     if (lvl & LF_FUNC) {
-        if ((lvl & ~LF_FUNC) & LF_FUNCLN) {
-            l -= snprintf(ring[ringnext].text, TISRC_LOG_LINESIZE, "%s (%s:%u): ", func, file, line);
-        } else {
-            l -= snprintf(ring[ringnext].text, TISRC_LOG_LINESIZE, "%s: ", func);
+        if (func) {
+            if ((lvl & ~LF_FUNC) & LF_FUNCLN) {
+                l -= snprintf(ring[ringnext].text, TISRC_LOG_LINESIZE, "%s (%s:%u): ", func, file, line);
+            } else {
+                l -= snprintf(ring[ringnext].text, TISRC_LOG_LINESIZE, "%s: ", func);
+            }
+        } else if ((lvl & ~LF_FUNC) & LF_FUNCLN) {
+            l -= snprintf(ring[ringnext].text, TISRC_LOG_LINESIZE, "%s:%u: ", file, line);
         }
         if (l < 1) l = 1;
     }
@@ -379,6 +382,15 @@ void plog_raw(enum loglevel lvl, const char* func, const char* file, unsigned li
     va_start(v, s);
     plog_internal(lvl, func, file, line, s, v);
     va_end(v);
+    #if TISRC_MTLVL >= 2
+    unlockMutex(&loglock);
+    #endif
+}
+void vplog_raw(enum loglevel lvl, const char* func, const char* file, unsigned line, const char* s, va_list v) {
+    #if TISRC_MTLVL >= 2
+    lockMutex(&loglock);
+    #endif
+    plog_internal(lvl, func, file, line, s, v);
     #if TISRC_MTLVL >= 2
     unlockMutex(&loglock);
     #endif

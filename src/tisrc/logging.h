@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <errno.h>
+#include <stdarg.h>
 
 PACKEDENUM loglevel {
     LL_PLAIN,            // Print without a prefix
@@ -41,6 +42,7 @@ extern mutex_t loglock;
 
 bool initLogging(void);
 void plog_raw(enum loglevel lvl, const char* fn, const char* f, unsigned l, const char* s, ...);
+void vplog_raw(enum loglevel lvl, const char* fn, const char* f, unsigned l, const char* s, va_list v);
 #define plog(lvl, ...) plog_raw(lvl, __func__, __FILE__, __LINE__, __VA_ARGS__)
 bool plog_setfile(const char*);
 
